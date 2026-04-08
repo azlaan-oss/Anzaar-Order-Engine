@@ -32,6 +32,19 @@ export default function Dashboard() {
   const itemsPerPage = 10;
 
   useEffect(() => {
+    // 1. Initial Load from Local Cache (Instant-on)
+    if (typeof window !== 'undefined') {
+      const cachedOrders = localStorage.getItem('anzaar_orders_v1');
+      const cachedLogs = localStorage.getItem('anzaar_logs_v1');
+      if (cachedOrders) {
+        setAllOrders(JSON.parse(cachedOrders));
+        setLoading(false);
+      }
+      if (cachedLogs) {
+        setLiveLogs(JSON.parse(cachedLogs));
+      }
+    }
+
     const fetchDashboardData = async () => {
       try {
         const ordersRef = collection(db, 'orders');
@@ -39,7 +52,9 @@ export default function Dashboard() {
         const orderSnap = await getDocs(q);
         const ordersList = [];
         orderSnap.forEach(doc => ordersList.push({ id: doc.id, ...doc.data() }));
+        
         setAllOrders(ordersList);
+        localStorage.setItem('anzaar_orders_v1', JSON.stringify(ordersList));
       } catch (err) {
         console.error("Dashboard fetch error:", err);
       } finally {
@@ -54,6 +69,7 @@ export default function Dashboard() {
       const logs = [];
       snap.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
       setLiveLogs(logs);
+      localStorage.setItem('anzaar_logs_v1', JSON.stringify(logs));
     });
 
     return () => unsubscribe();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   getProducts, 
   createOrder 
@@ -19,7 +19,8 @@ import {
   CheckCircle2, 
   ChevronRight,
   Info,
-  RefreshCw
+  RefreshCw,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -28,6 +29,19 @@ export default function OrderForm({ onSuccess }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [productSearch, setProductSearch] = useState('');
+  const [isProductListOpen, setIsProductListOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsProductListOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Form State
   const [order, setOrder] = useState({
@@ -213,7 +227,7 @@ export default function OrderForm({ onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
       
       {/* Left Column: Customer & Selection */}
       <div className="space-y-8">
@@ -233,6 +247,7 @@ export default function OrderForm({ onSuccess }) {
               <div className="relative">
                 <input 
                   type="text" required
+                  autoFocus
                   value={order.customer.name}
                   onChange={e => setOrder({...order, customer: {...order.customer, name: e.target.value}})}
                   className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10" 
@@ -283,7 +298,7 @@ export default function OrderForm({ onSuccess }) {
         </section>
 
         {/* Section: Product Smart Selector */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+        <section className={`bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
           <div className="flex items-center gap-2 mb-2">
              <div className="bg-gold-50 p-2 rounded-lg text-gold-600">
                <ShoppingBag className="w-5 h-5" />
@@ -291,15 +306,63 @@ export default function OrderForm({ onSuccess }) {
              <h3 className="font-serif font-bold text-lg text-gray-900">Add Products</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <select 
-              value={selectedProductId}
-              onChange={e => { setSelectedProductId(e.target.value); setSelectedVariantId(''); }}
-              className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none"
-             >
-                <option value="">Select Product...</option>
-                {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-             </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" ref={searchRef}>
+            <div className="relative group">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-900 transition-colors">
+                <Search className="w-4 h-4" />
+              </div>
+              <input 
+                type="text"
+                placeholder="Smart Search Product..."
+                value={productSearch || (selectedProduct?.name || '')}
+                onChange={(e) => {
+                  setProductSearch(e.target.value);
+                  setIsProductListOpen(true);
+                  if (e.target.value === '') setSelectedProductId('');
+                }}
+                onFocus={() => setIsProductListOpen(true)}
+                className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 pl-10 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none placeholder:text-gray-300"
+              />
+              
+              <AnimatePresence>
+                {isProductListOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto overflow-x-hidden custom-scrollbar"
+                  >
+                    {products.filter(p => 
+                      p.name.toLowerCase().includes(productSearch.toLowerCase())
+                    ).length === 0 ? (
+                      <div className="p-4 text-center text-xs text-gray-400 italic">No products found</div>
+                    ) : (
+                      products.filter(p => 
+                        p.name.toLowerCase().includes(productSearch.toLowerCase())
+                      ).map(p => (
+                        <div 
+                          key={p.id}
+                          onClick={() => {
+                            setSelectedProductId(p.id);
+                            setSelectedVariantId('0'); // Auto-select first variant
+                            setSelectedSize('52(S)');  // Auto-select first size
+                            setProductSearch('');
+                            setIsProductListOpen(false);
+                          }}
+                          className="p-4 hover:bg-emerald-50 cursor-pointer flex items-center justify-between border-b border-gray-50 last:border-0"
+                        >
+                           <div>
+                             <p className="text-xs font-bold text-emerald-950 uppercase">{p.name}</p>
+                             <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{p.category || 'Luxury'}</p>
+                           </div>
+                           <span className="text-[10px] font-black text-emerald-900">৳{p.basePrice}</span>
+                        </div>
+                      ))
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
              <select 
               value={selectedVariantId}
@@ -307,7 +370,6 @@ export default function OrderForm({ onSuccess }) {
               onChange={e => setSelectedVariantId(e.target.value)}
               className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none disabled:opacity-50"
              >
-                <option value="">Select Color...</option>
                 {selectedProduct?.variants.map((v, idx) => (
                   <option key={idx} value={idx}>{v.color}</option>
                 ))}
@@ -319,7 +381,6 @@ export default function OrderForm({ onSuccess }) {
               onChange={e => setSelectedSize(e.target.value)}
               className="w-full md:col-span-2 bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none disabled:opacity-50"
              >
-                <option value="">Select Size...</option>
                 <option value="52(S)">52 (S)</option>
                 <option value="54(M)">54 (M)</option>
                 <option value="56(L)">56 (L)</option>

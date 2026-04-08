@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Plus, X, Upload, Check, Trash2, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { compressImage } from '../src/utils/image-utils';
+import { compressImage } from '../utils/image-utils';
 import { addProduct, uploadProductImage } from '../lib/firebase-utils';
 import { toast } from 'sonner';
 

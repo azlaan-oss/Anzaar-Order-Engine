@@ -17,44 +17,73 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../lib/firebase';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, onSnapshot } from 'firebase/firestore';
+import { logActivity } from '../lib/logger';
+import { updateOrder } from '../lib/firebase-utils';
+import { toast } from 'sonner';
+import { createPortal } from 'react-dom';
 
 export default function OrderDetailModal({ order, onClose }) {
   const [activityLogs, setActivityLogs] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      if (!order?.orderId) return;
-      try {
-        const q = query(
-          collection(db, "activity_logs"),
-          where("details.orderId", "==", order.orderId),
-          orderBy("timestamp", "desc")
-        );
-        const snap = await getDocs(q);
-        const logs = [];
-        snap.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
-        setActivityLogs(logs);
-      } catch (err) {
-        console.error("History fetch err:", err);
-      } finally {
-        setLoadingHistory(false);
-      }
-    };
-    fetchHistory();
-  }, [order]);
+    setMounted(true);
+    if (!order?.orderId) return;
+    
+    // Live listener for history to reflect updates immediately
+    const q = query(
+      collection(db, "activity_logs"),
+      where("details.orderId", "==", order.orderId),
+      orderBy("timestamp", "desc")
+    );
+    
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const logs = [];
+      snap.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
+      setActivityLogs(logs);
+      setLoadingHistory(false);
+    }, (err) => {
+      console.error("History sync err:", err);
+      setLoadingHistory(false);
+    });
 
-  if (!order) return null;
+    return () => unsubscribe();
+  }, [order?.orderId]);
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  const handleStatusChange = async (newStatus) => {
+    if (newStatus === order.status) return;
+    setUpdatingStatus(true);
+    const toastId = toast.loading(`Transitioning order to ${newStatus}...`);
+    
+    try {
+      await updateOrder(order.id, { status: newStatus });
+      await logActivity("Moderator", `Updated Status to ${newStatus}`, { 
+        orderId: order.orderId, 
+        previousStatus: order.status || 'pending',
+        newStatus: newStatus 
+      });
+      toast.success("Protocol updated successfully", { id: toastId });
+    } catch (err) {
+      toast.error("Failed to update system protocol", { id: toastId });
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
+  if (!order || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
       <motion.div 
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-emerald-950/40 backdrop-blur-md"
+        className="absolute inset-0 bg-emerald-950/60 backdrop-blur-xl"
       />
       
       <motion.div 
@@ -171,7 +200,7 @@ export default function OrderDetailModal({ order, onClose }) {
                 <div className="space-y-6 animate-pulse p-4">
                    {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl" />)}
                 </div>
-              ) : history.length === 0 ? (
+              ) : activityLogs.length === 0 ? (
                 <div className="text-center py-20 text-gray-300">
                    <Clock className="w-10 h-10 mx-auto opacity-20 mb-3" />
                    <p className="text-[10px] font-bold uppercase tracking-widest">No detailed logs</p>
@@ -192,14 +221,31 @@ export default function OrderDetailModal({ order, onClose }) {
               )}
            </div>
 
-           <div className="mt-8 pt-8 border-t border-gray-200 space-y-4">
+           <div className="mt-8 pt-8 border-t border-gray-200 space-y-6">
+              <div className="space-y-2">
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Master Controls</p>
+                 <select 
+                  value={order.status || 'pending'}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  disabled={updatingStatus}
+                  className="w-full bg-white border border-gray-200 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-emerald-900/10 transition-all disabled:opacity-50"
+                 >
+                    <option value="pending">Pending Review</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="shipped">Dispatched</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="canceled">Canceled</option>
+                 </select>
+              </div>
+
               <div className="flex items-center gap-2 bg-emerald-950 text-gold-400 p-4 rounded-2xl shadow-xl">
                  <Package className="w-5 h-5" />
-                 <span className="text-[10px] font-black uppercase tracking-widest">Status: PENDING</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest">Status: {order.status?.toUpperCase() || 'PENDING'}</span>
               </div>
            </div>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
