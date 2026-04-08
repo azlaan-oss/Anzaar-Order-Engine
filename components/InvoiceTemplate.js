@@ -1,6 +1,17 @@
-import React from 'react';
+import { db } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
+  const [settings, setSettings] = React.useState(null);
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      const snap = await getDoc(doc(db, "settings", "global"));
+      if (snap.exists()) setSettings(snap.data());
+    };
+    fetchSettings();
+  }, []);
+
   if (!order) return null;
 
   const { customer, items, totals, timestamp } = order;
@@ -18,9 +29,16 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
     >
       {/* Header */}
       <div className="flex justify-between items-start border-b-2 border-emerald-900/10 pb-8">
-        <div>
-          <h1 className="text-4xl font-serif font-bold tracking-tight">anzaar</h1>
-          <p className="text-xs uppercase tracking-[0.3em] font-bold text-emerald-900/60 mt-1">Order Invoice</p>
+        <div className="flex items-center gap-6">
+           {settings?.logoUrl && (
+              <div className="w-24 h-24 bg-white rounded-2xl p-2 overflow-hidden flex items-center justify-center border border-emerald-900/10 shadow-sm">
+                 <img src={settings.logoUrl} className="max-w-full max-h-full object-contain" alt="Brand Logo" />
+              </div>
+           )}
+           <div>
+              <h1 className="text-4xl font-serif font-bold tracking-tight uppercase leading-none">{settings?.brandName || 'anzaar'}</h1>
+              <p className="text-xs uppercase tracking-[0.3em] font-bold text-emerald-900/60 mt-1">Order Invoice</p>
+           </div>
         </div>
         <div className="text-right">
           <p className="text-sm font-bold opacity-40 uppercase tracking-widest">Date</p>
@@ -39,9 +57,17 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         <div className="text-right">
            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/40 mb-2">Order Summary</p>
            <p className="text-sm font-bold">Status: <span className="text-emerald-600">PAID (ADV)</span></p>
-           {order.payment.advancePaid && (
-             <p className="text-xs text-gray-400 mt-1">Trx ID: {order.payment.transactionId}</p>
-           )}
+            {order.payment.advancePaid && (
+              <div className="mt-2 flex items-center justify-end gap-3">
+                <div className="text-right">
+                  <p className="text-[10px] text-gray-400 font-bold">Transaction ID</p>
+                  <p className="text-xs font-bold">{order.payment.transactionId}</p>
+                </div>
+                {order.payment.proofUrl && (
+                  <img src={order.payment.proofUrl} className="w-12 h-12 rounded-lg border border-emerald-950/10 object-cover" />
+                )}
+              </div>
+            )}
         </div>
       </div>
 

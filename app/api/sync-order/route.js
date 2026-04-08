@@ -28,32 +28,34 @@ export async function POST(req) {
 
     const values = [
       [
-        new Date(order.timestamp).toLocaleDateString(), // Date
+        new Date(order.timestamp).toLocaleDateString('en-GB'), // Date (DD/MM/YYYY)
         order.orderId,                                  // Order Number
         isUrgent,                                       // Urgent
         order.customer.notes || '',                     // Note
         order.customer.name,                            // Name
-        order.customer.phone,                           // Phone Number
+        `'${order.customer.phone}`,                     // Phone Number (Lead with ' to keep as string)
         order.customer.address,                         // Address
         order.items.map(i => `${i.name} (${i.color})`).join(', '), // Product Info
         order.items.map(i => i.size).join(', '),        // Size
-        "View in App",                                  // Product Photo (Using placeholder as base64 is too massive for Sheets)
+        order.payment.proofUrl ? "Photo Uploaded" : "No Photo", // Product Photo Status
         productsSum,                                    // Price
         order.totals.delivery,                          // Delivery Charge
         order.totals.total,                             // Total
         order.payment.advancePaid ? order.payment.amount : 0, // Advance
-        order.payment.method === 'Bkash' ? order.payment.transactionId : (order.payment.transactionId || ''), // Bkash
+        order.payment.transactionId || '',              // Transaction ID
         order.totals.due,                               // Due
-        '',                                             // DM (Delivery Man - default empty)
-        'Pending'                                       // Shipment Status
+        order.payment.senderPhone || '',                // Sender Phone
+        order.status || 'Pending Review',               // Protocol Status
+        order.isUrgent ? 'URGENT Fulfillment' : 'Regular' // Priority Detail
       ]
     ];
 
     // 4. Append to sheet
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: `${sheetTab}!A:R`,
+      range: `${sheetTab}!A:T`, // Expanded to 20 columns
       valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
       requestBody: { values },
     });
 

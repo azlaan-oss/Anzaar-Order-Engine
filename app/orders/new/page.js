@@ -20,17 +20,31 @@ export default function NewOrderPage() {
     const toastId = toast.loading("Generating Luxury Invoice...");
 
     try {
-      // Small delay to ensure render
-      await new Promise(r => setTimeout(r, 500));
-      const dataUrl = await toJpeg(invoiceRef.current, { quality: 0.95 });
+      // Small delay to ensure render of hidden template with new data
+      await new Promise(r => setTimeout(r, 1500));
+      
+      const dataUrl = await toJpeg(invoiceRef.current, { 
+        quality: 0.95,
+        cacheBust: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      // Convert to Blob for safer download on all platforms
+      const resp = await fetch(dataUrl);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
       const link = document.createElement('a');
-      link.download = `anzaar-invoice-${order.customer.name.replace(/\s+/g, '-')}-${Date.now()}.jpg`;
-      link.href = dataUrl;
+      const safeName = order.customer.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      link.download = `anzaar-${order.orderId || 'new'}-${safeName}.jpg`;
+      link.href = blobUrl;
       link.click();
+      
+      URL.revokeObjectURL(blobUrl);
       toast.success("Invoice downloaded as JPG!", { id: toastId });
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to generate invoice image", { id: toastId });
+      console.error("Invoice Error:", err);
+      toast.error("Generation failed. Please try 'Download Again'.", { id: toastId });
     } finally {
       setIsGenerating(false);
     }
@@ -56,10 +70,6 @@ export default function NewOrderPage() {
           </div>
         </div>
         
-        <div className="hidden md:flex items-center gap-3 bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-100">
-           <Sparkles className="w-4 h-4 text-emerald-900" />
-           <span className="text-xs font-bold text-emerald-900 uppercase tracking-widest">Auto-Calculation Active</span>
-        </div>
       </div>
 
       {/* Main Order Form */}

@@ -14,11 +14,15 @@ import {
   Zap, 
   ShieldCheck, 
   Globe,
-  BellRing
+  BellRing,
+  Image as ImageIcon,
+  Upload,
+  Trash2 as TrashIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { uploadProductImage } from '../../../lib/firebase-utils';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -31,6 +35,7 @@ export default function SettingsPage() {
     orderPrefix: 'A0226-',
     orderSequence: 1,
     deliveryRates: { inside: 80, outside: 150 },
+    logoUrl: '',
     campaigns: [
       { name: 'None', percentage: 0 },
       { name: 'Eid Promo', percentage: 5 },
@@ -78,6 +83,7 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: 'sheets', label: 'Order Sync', icon: Database },
+    { id: 'branding', label: 'Branding', icon: ImageIcon },
     { id: 'logistics', label: 'Shipping', icon: Truck },
     { id: 'campaigns', label: 'Discount', icon: Tag },
   ];
@@ -211,6 +217,73 @@ export default function SettingsPage() {
                         </div>
                         <p className="text-[9px] text-emerald-900/30 font-black uppercase tracking-widest pl-2 mt-2 italic">Output Example: {(settings.orderPrefix || '') + String(settings.orderSequence || 1).padStart(2, '0')}</p>
                       </div>
+                    </div>
+                  </div>
+                )}
+                {activeTab === 'branding' && (
+                  <div className="space-y-10 flex-1">
+                    <div className="space-y-2">
+                       <h3 className="text-3xl font-serif font-black text-emerald-950 uppercase tracking-tighter">Brand Identity</h3>
+                       <p className="text-gray-400 text-sm font-medium">Upload your company logo to be used across invoices and system headers.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       <div className="space-y-1 col-span-full">
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/50 pl-2">Business Name</label>
+                         <input 
+                          type="text" 
+                          value={settings.brandName || ''}
+                          onChange={e => setSettings({...settings, brandName: e.target.value})}
+                          className="w-full bg-gray-50 text-emerald-950 font-black text-sm border-2 border-transparent focus:border-emerald-900/10 p-5 rounded-3xl outline-none transition-all shadow-inner" 
+                          placeholder="e.g. ANZAAR CLOTHING"
+                         />
+                       </div>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-emerald-100 rounded-[3rem] bg-emerald-50/20 space-y-6">
+                       {settings.logoUrl ? (
+                         <div className="relative group">
+                           <div className="w-40 h-40 bg-white rounded-3xl shadow-xl border border-emerald-100 p-2 overflow-hidden flex items-center justify-center">
+                              <img src={settings.logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                           </div>
+                           <button 
+                             onClick={() => setSettings({...settings, logoUrl: ''})}
+                             className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                           >
+                              <TrashIcon className="w-4 h-4" />
+                           </button>
+                         </div>
+                       ) : (
+                         <div className="flex flex-col items-center gap-4">
+                            <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center">
+                               <ImageIcon className="w-10 h-10" />
+                            </div>
+                            <p className="text-[10px] font-black text-emerald-950/40 uppercase tracking-widest text-center">No logo detected in engine</p>
+                         </div>
+                       )}
+
+                       <label className="cursor-pointer bg-emerald-950 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                          <Upload className="w-4 h-4" />
+                          {settings.logoUrl ? 'Change Logo' : 'Upload Logo'}
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={async (e) => {
+                               const file = e.target.files[0];
+                               if (file) {
+                                 try {
+                                   const url = await uploadProductImage(file);
+                                   setSettings({...settings, logoUrl: url});
+                                   toast.success("Logo processed successfully");
+                                 } catch (err) {
+                                   toast.error("Failed to process image");
+                                 }
+                               }
+                            }}
+                          />
+                       </label>
+                       <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Recommended: Square Format (PNG/JPG)</p>
                     </div>
                   </div>
                 )}

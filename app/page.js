@@ -308,7 +308,7 @@ export default function Dashboard() {
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
            </div>
 
-           <div className="bg-emerald-950/95 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl flex-1 flex flex-col overflow-hidden min-h-[400px]">
+           <div className="bg-emerald-950/95 backdrop-blur-lg p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] shadow-2xl flex-1 flex flex-col overflow-hidden min-h-[400px]">
               <div className="space-y-4 overflow-y-auto custom-scrollbar-dark flex-1 pr-2">
                  <AnimatePresence mode="popLayout">
                     {liveLogs.map((log) => (
