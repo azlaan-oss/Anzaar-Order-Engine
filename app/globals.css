@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #022c22;
+  --font-serif: 'Century Gothic', 'CenturyGothic', 'AppleGothic', sans-serif;
+  --font-sans: 'Samsung Sans', 'SamsungSans', 'Inter', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #022c22;
+    --foreground: #f8fafc;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif) !important;
+}
+
+.premium-title {
+  font-family: var(--font-serif);
+  @apply tracking-tight font-black text-emerald-950 dark:text-gray-100;
+}
+
+.glass-card {
+  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl;
+}
+
+.btn-primary {
+  @apply bg-emerald-900 hover:bg-emerald-950 text-white px-6 py-3 rounded-xl transition-all duration-300 font-semibold shadow-lg active:scale-95;
+}
+
+.btn-secondary {
+  @apply border-2 border-emerald-900/20 hover:border-emerald-900 text-emerald-900 px-6 py-3 rounded-xl transition-all duration-300 font-semibold;
+}
