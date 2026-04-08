@@ -1,10 +1,11 @@
+import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
-  const [settings, setSettings] = React.useState(null);
+  const [settings, setSettings] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchSettings = async () => {
       const snap = await getDoc(doc(db, "settings", "global"));
       if (snap.exists()) setSettings(snap.data());
