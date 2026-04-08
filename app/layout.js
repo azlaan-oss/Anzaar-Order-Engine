@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import Sidebar from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
+import PWA from "../components/PWA";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
@@ -20,8 +21,10 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#022c22" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} bg-gray-50 dark:bg-emerald-950 antialiased`}>
+        <PWA />
         <div className="min-h-screen flex flex-col md:flex-row">
           <Sidebar />
           {/* Main Content */}
