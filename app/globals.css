@@ -5,8 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #022c22;
-  --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Inter', sans-serif;
+  --font-primary: "Century Gothic", "Samsung Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-secondary: "Samsung Sans", "Century Gothic", "Inter", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,7 +19,8 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-sans);
+  font-family: var(--font-primary);
+  font-weight: 400;
 }
 
 .premium-title {
@@ -58,4 +59,13 @@ body {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-emerald-900/10 rounded-full hover:bg-emerald-900/30 transition-colors;
+}
+
+/* Hide scrollbars but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

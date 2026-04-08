@@ -238,7 +238,7 @@ export default function OrdersPage() {
 
         {/* Layer 2: Filter Controls */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 md:gap-0 px-4 md:px-0">
-           <div className="flex bg-white/50 backdrop-blur-sm p-1 rounded-xl border border-gray-100 shadow-sm">
+           <div className="flex bg-white/50 backdrop-blur-sm p-1 rounded-xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar flex-nowrap min-w-0 w-full md:w-auto">
               {['all', 'today', 'yesterday', '7days', '30days'].map((d) => (
                  <button
                     key={d}
@@ -247,7 +247,7 @@ export default function OrdersPage() {
                         setStartDate('');
                         setEndDate('');
                     }}
-                    className={`px-5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                    className={`px-4 md:px-5 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all whitespace-nowrap shrink-0 ${
                        dateFilter === d && !startDate 
                        ? 'bg-emerald-950 text-white shadow-md' 
                        : 'text-emerald-950/40 hover:text-emerald-950'
@@ -258,8 +258,8 @@ export default function OrdersPage() {
               ))}
            </div>
            
-           <div className="text-[9px] font-black text-emerald-950/20 uppercase tracking-[0.3em]">
-              {filteredOrders.length} Orders Found
+           <div className="hidden md:block text-[9px] font-bold text-emerald-950/20 uppercase tracking-[0.3em] pr-2">
+              {filteredOrders.length} Total Protocols
            </div>
         </div>
       </div>
