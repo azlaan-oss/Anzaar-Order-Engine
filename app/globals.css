@@ -5,8 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #022c22;
-  --font-serif: 'Century Gothic', 'CenturyGothic', 'AppleGothic', sans-serif;
-  --font-sans: 'Samsung Sans', 'SamsungSans', 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,16 +20,11 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-sans);
-  font-weight: 400;
-}
-
-h1, h2, h3, h4, .font-serif {
-  font-family: var(--font-serif) !important;
 }
 
 .premium-title {
   font-family: var(--font-serif);
-  @apply tracking-tight font-black text-emerald-950 dark:text-gray-100;
+  @apply tracking-tight font-bold text-emerald-950 dark:text-gold-400;
 }
 
 .glass-card {

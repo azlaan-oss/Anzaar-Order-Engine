@@ -13,136 +13,103 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
   return (
     <div 
       ref={ref}
-      className="w-[450px] bg-white p-8 text-emerald-950 font-sans"
-      style={{ minHeight: '800px' }}
+      className="w-[800px] bg-white p-12 text-emerald-950 font-sans"
+      style={{ minHeight: '1000px' }}
     >
       {/* Header */}
-      <div className="flex justify-between items-center border-b-2 border-emerald-900/10 pb-6">
+      <div className="flex justify-between items-start border-b-2 border-emerald-900/10 pb-8">
         <div>
-          <h1 className="text-3xl font-serif font-black tracking-tighter text-emerald-950">anzaar</h1>
-          <p className="text-[8px] uppercase tracking-[0.4em] font-bold text-emerald-900/40 mt-1">Order Architecture</p>
+          <h1 className="text-4xl font-serif font-bold tracking-tight">anzaar</h1>
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-emerald-900/60 mt-1">Order Invoice</p>
         </div>
         <div className="text-right">
-           <div className="bg-emerald-950 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-1">
-              Invoice
-           </div>
-           <p className="text-[10px] font-bold text-emerald-900/40">{date}</p>
+          <p className="text-sm font-bold opacity-40 uppercase tracking-widest">Date</p>
+          <p className="font-bold">{date}</p>
         </div>
       </div>
 
       {/* Customer Info */}
-      <div className="mt-8 space-y-4">
-        <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/30 mb-2">Recipient Information</p>
-          <h2 className="text-lg font-black text-emerald-950">{customer.name}</h2>
-          <p className="text-xs font-bold text-emerald-800 mt-1">{customer.phone}</p>
-          <p className="text-xs text-gray-500 mt-2 leading-relaxed font-medium">{customer.address}</p>
+      <div className="mt-12 grid grid-cols-2 gap-12">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/40 mb-2">Customer Details</p>
+          <h2 className="text-xl font-bold">{customer.name}</h2>
+          <p className="text-sm mt-1">{customer.phone}</p>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">{customer.address}</p>
         </div>
-        
-        <div className="flex justify-between items-center px-2">
-           <div>
-              <p className="text-[9px] font-bold uppercase text-gray-400">Transaction Proof</p>
-              <p className="text-xs font-black text-emerald-900">
-                {order.payment.advancePaid ? `Trx: ${order.payment.transactionId}` : 'CASH ON DELIVERY'}
-              </p>
-           </div>
-           <div className="text-right">
-              <p className="text-[9px] font-bold uppercase text-gray-400">Order ID</p>
-              <p className="text-xs font-black text-emerald-950">#{order.orderId}</p>
-           </div>
+        <div className="text-right">
+           <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/40 mb-2">Order Summary</p>
+           <p className="text-sm font-bold">Status: <span className="text-emerald-600">PAID (ADV)</span></p>
+           {order.payment.advancePaid && (
+             <p className="text-xs text-gray-400 mt-1">Trx ID: {order.payment.transactionId}</p>
+           )}
         </div>
       </div>
 
-      {/* Compact Product Grid */}
-      <div className="mt-8 space-y-3">
-         <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/30 pl-1">Items Secured</p>
-         <div className="divide-y divide-emerald-900/5 border-t border-b border-emerald-900/5">
-            {items.map((item, idx) => (
-              <div key={idx} className="py-4 flex items-center justify-between gap-4">
-                 <div className="flex items-center gap-3">
-                    <div className="relative">
-                       <img src={item.image} className="w-14 h-14 rounded-xl object-cover ring-1 ring-emerald-900/5" />
-                       <span className="absolute -top-2 -right-2 bg-emerald-950 text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                         {item.quantity}
-                       </span>
-                    </div>
-                    <div>
-                       <p className="text-sm font-black text-emerald-950 leading-tight">{item.name}</p>
-                       <p className="text-[9px] text-emerald-900/60 font-bold uppercase tracking-tight mt-0.5">
-                         {item.color} • {item.size}
-                       </p>
-                    </div>
-                 </div>
-                 <div className="text-right">
-                    <p className="text-sm font-black text-emerald-900">৳ {item.price}</p>
-                    {item.extraCharge > 0 && <p className="text-[8px] font-bold text-amber-600 tracking-tighter">+ Surcharge Included</p>}
-                 </div>
-              </div>
-            ))}
-         </div>
-      </div>
+      {/* Table */}
+      <table className="w-full mt-12">
+        <thead>
+          <tr className="border-b border-emerald-900/10 text-[10px] font-bold uppercase tracking-widest text-left">
+            <th className="py-4">Item Description</th>
+            <th className="py-4 text-center">Qty</th>
+            <th className="py-4 text-right">Price</th>
+            <th className="py-4 text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-emerald-900/5">
+          {items.map((item, idx) => (
+            <tr key={idx} className="text-sm">
+              <td className="py-6">
+                <p className="font-bold">{item.name}</p>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider">{item.color} • SKU: {item.sku}</p>
+              </td>
+              <td className="py-6 text-center">{item.quantity}</td>
+              <td className="py-6 text-right">৳ {item.price}</td>
+              <td className="py-6 text-right font-bold text-emerald-900">৳ {item.price * item.quantity}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      {/* Compact Total Ledger */}
-      <div className="mt-8 bg-gray-50/50 p-6 rounded-3xl space-y-3 border border-gray-100">
-          <div className="flex justify-between text-xs font-bold text-gray-400">
-            <span>Market Subtotal</span>
-            <span className="text-emerald-950">৳ {totals.subtotal}</span>
+      {/* Totals */}
+      <div className="mt-12 flex justify-end">
+        <div className="w-64 space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Subtotal</span>
+            <span className="font-bold">৳ {totals.subtotal}</span>
           </div>
           {totals.discount > 0 && (
-            <div className="flex justify-between text-xs font-bold text-red-500">
-              <span>Campaign Reward</span>
+            <div className="flex justify-between text-sm text-red-500">
+              <span>Discount</span>
               <span>- ৳ {totals.discount}</span>
             </div>
           )}
-          <div className="flex justify-between text-xs font-bold text-gray-400 pb-3 border-b border-gray-200">
-            <span>Logistics Fee</span>
-            <span className="text-emerald-950">+ ৳ {totals.delivery}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">Delivery Fee</span>
+            <span>+ ৳ {totals.delivery}</span>
           </div>
-          
-          <div className="flex justify-between pt-1">
-            <span className="font-serif font-black text-xl text-emerald-950">Grand Total</span>
-            <span className="font-serif font-black text-2xl text-emerald-900">৳ {totals.total}</span>
+          <div className="flex justify-between border-t-2 border-emerald-950 pt-4 mt-4">
+            <span className="font-serif font-bold text-lg">Total Amount</span>
+            <span className="font-serif font-bold text-xl text-emerald-900">৳ {totals.total}</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-2 mt-4">
-             <div className="bg-emerald-100/50 p-3 rounded-2xl border border-emerald-200/50">
-                <p className="text-[8px] font-bold uppercase text-emerald-600 mb-1">Paid Amount</p>
-                <p className="text-sm font-black text-emerald-700">৳ {totals.paid}</p>
-             </div>
-             <div className="bg-red-50 p-3 rounded-2xl border border-red-100">
-                <p className="text-[8px] font-bold uppercase text-red-400 mb-1">Due Balance</p>
-                <p className="text-sm font-black text-red-600">৳ {totals.due}</p>
-             </div>
+          <div className="flex justify-between text-sm font-bold text-emerald-600 bg-emerald-50 p-2 rounded-lg">
+            <span>Amount Paid</span>
+            <span>৳ {totals.paid}</span>
           </div>
+          <div className="flex justify-between text-sm font-bold text-red-600 bg-red-50 p-2 rounded-lg">
+            <span>Remaining Due</span>
+            <span>৳ {totals.due}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Premium Footer with QR */}
-      <div className="mt-12 pt-8 border-t-2 border-emerald-900/5 flex justify-between items-end">
-        <div className="space-y-4 flex-1 pr-6">
-           <div className="space-y-1">
-             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-900/40">Tracking Capability</p>
-             <p className="text-[9px] font-medium text-emerald-800 leading-relaxed italic pr-4">
-               "Scan the premium QR code with your mobile device to track order status and estimated arrival."
-             </p>
-           </div>
-           
-           <div className="pt-4 flex items-center gap-4 text-[7px] font-black uppercase text-emerald-900/20 tracking-[0.2em]">
-              <span>anzaar • premium abaya collection</span>
-              <div className="w-1 h-1 rounded-full bg-emerald-100" />
-              <span>luxury certified</span>
-           </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-2">
-           <div className="p-3 bg-white border border-emerald-900/10 rounded-3xl shadow-sm">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${typeof window !== 'undefined' ? window.location.origin : ''}/track/${order.id}`} 
-                alt="Scan to track"
-                className="w-20 h-20"
-              />
-           </div>
-           <p className="text-[8px] font-black text-emerald-950 uppercase tracking-widest">Scan to Track</p>
-        </div>
+      {/* Footer */}
+      <div className="mt-24 pt-8 border-t border-emerald-900/10 text-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-950/30">
+          Thank you for choosing luxury.
+        </p>
+        <p className="text-[8px] text-gray-300 mt-2 italic">
+          This is a computer-generated invoice. No signature required.
+        </p>
       </div>
     </div>
   );

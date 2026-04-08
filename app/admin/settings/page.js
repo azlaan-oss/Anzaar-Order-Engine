@@ -14,9 +14,7 @@ import {
   Zap, 
   ShieldCheck, 
   Globe,
-  BellRing,
-  Palette,
-  Image as ImageIcon
+  BellRing
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -25,11 +23,9 @@ import Link from 'next/link';
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('branding'); // branding, sheets, logistics, campaigns
+  const [activeTab, setActiveTab] = useState('sheets'); // sheets, logistics, campaigns
   
   const [settings, setSettings] = useState({
-    siteName: 'anzaar',
-    siteLogoUrl: '',
     activeSheetId: '',
     activeSheetTab: 'Sheet1',
     orderPrefix: 'A0226-',
@@ -54,8 +50,7 @@ export default function SettingsPage() {
         const docRef = doc(db, "settings", "global");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          const data = docSnap.data();
-          setSettings(prev => ({ ...prev, ...data }));
+          setSettings(docSnap.data());
         }
       } catch (err) {
         console.error(err);
@@ -82,7 +77,6 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'branding', label: 'Site Identity', icon: Palette },
     { id: 'sheets', label: 'Order Sync', icon: Database },
     { id: 'logistics', label: 'Shipping', icon: Truck },
     { id: 'campaigns', label: 'Discount', icon: Tag },
@@ -99,12 +93,12 @@ export default function SettingsPage() {
                 <ArrowLeft className="w-5 h-5" />
              </Link>
              <div className="px-3 py-1 bg-emerald-950 text-gold-400 rounded-full text-[10px] font-bold uppercase tracking-widest border border-gold-400/20 shadow-lg">
-                System Core v3.1
+                System Core v3.0
              </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-black text-emerald-950 tracking-tighter uppercase leading-none">Internal Protocols</h1>
           <p className="text-gray-400 font-medium text-sm md:text-base max-w-xl">
-             Configure the strategic engine. Manage visual identity, sync ID, and calibrate global campaigns.
+             Configure the strategic engine. Managed sync ID, adjust logistics, and calibrate global campaigns.
           </p>
         </div>
 
@@ -167,50 +161,6 @@ export default function SettingsPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm min-h-[500px] flex flex-col"
               >
-                {activeTab === 'branding' && (
-                  <div className="space-y-10 flex-1">
-                    <div className="space-y-2">
-                       <h3 className="text-3xl font-serif font-black text-emerald-950 uppercase tracking-tighter">Site Identity</h3>
-                       <p className="text-gray-400 text-sm font-medium">Control the global branding parameters and visual anchors of the platform.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-1 col-span-full">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/50 pl-2">Display Site Name</label>
-                        <input 
-                         type="text" 
-                         value={settings.siteName}
-                         onChange={e => setSettings({...settings, siteName: e.target.value})}
-                         className="w-full bg-gray-50 text-emerald-950 font-black text-sm border-2 border-transparent focus:border-emerald-900/10 p-5 rounded-3xl outline-none transition-all shadow-inner" 
-                         placeholder="e.g. anzaar"
-                        />
-                      </div>
-                      
-                      <div className="space-y-1 col-span-full">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-900/50 pl-2">Custom Logo URL (SVG/PNG)</label>
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <input 
-                             type="text" 
-                             value={settings.siteLogoUrl || ''}
-                             onChange={e => setSettings({...settings, siteLogoUrl: e.target.value})}
-                             className="w-full bg-gray-50 text-emerald-950 font-mono text-sm border-2 border-transparent focus:border-emerald-900/10 p-5 rounded-3xl outline-none transition-all shadow-inner" 
-                             placeholder="https://example.com/logo.svg"
-                            />
-                          </div>
-                          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center border-2 border-gray-100 overflow-hidden">
-                             {settings.siteLogoUrl ? (
-                               <img src={settings.siteLogoUrl} alt="Preview" className="w-full h-full object-contain p-2" />
-                             ) : (
-                               <ImageIcon className="w-6 h-6 text-gray-200" />
-                             )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {activeTab === 'sheets' && (
                   <div className="space-y-10 flex-1">
                     <div className="space-y-2">

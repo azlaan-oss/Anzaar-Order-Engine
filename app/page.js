@@ -59,38 +59,6 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, []);
 
-  const handleManualSync = async (order) => {
-    const toastId = toast.loading(`Syncing #${order.orderId} to Sheets...`);
-    try {
-      // 1. Get Settings
-      const settingsSnap = await getDoc(doc(db, "settings", "global"));
-      const settings = settingsSnap.data();
-
-      // 2. Trigger Sync
-      const res = await fetch('/api/sync-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...order, 
-          sheetId: settings?.activeSheetId,
-          sheetTab: settings?.activeSheetTab || 'Sheet1'
-        })
-      });
-      
-      if (res.ok) {
-        await updateDoc(doc(db, "orders", order.id), { syncStatus: 'synced' });
-        toast.success("Synced successfully!", { id: toastId });
-        // Refresh local data
-        setAllOrders(prev => prev.map(o => o.id === order.id ? {...o, syncStatus: 'synced'} : o));
-      } else {
-        const err = await res.text();
-        toast.error(`Sync Failed: ${err}`, { id: toastId });
-      }
-    } catch (error) {
-      toast.error(`Error: ${error.message}`, { id: toastId });
-    }
-  };
-
   // Filtering Logic
   const filteredData = useMemo(() => {
     const now = new Date();
@@ -272,26 +240,17 @@ export default function Dashboard() {
                          </div>
                       </div>
 
-                       <div className="flex items-center gap-4 md:gap-8">
-                          <div className="flex flex-col items-end gap-1">
-                             {order.syncStatus !== 'synced' && (
-                               <button 
-                                onClick={(e) => { e.stopPropagation(); handleManualSync(order); }}
-                                className="px-2 py-0.5 bg-red-50 text-red-500 text-[8px] font-bold rounded-md hover:bg-red-100 transition-colors flex items-center gap-1"
-                               >
-                                 <RefreshCw className="w-2 h-2" />
-                                 Sync Missed
-                               </button>
-                             )}
-                             <p className="text-sm md:text-lg font-black text-emerald-950 leading-none">৳ {order.totals?.total}</p>
-                             {order.totals?.due > 0 ? (
-                               <p className="text-[8px] md:text-[9px] font-bold text-amber-600 uppercase">Due ৳{order.totals.due}</p>
-                             ) : (
-                               <p className="text-[8px] md:text-[9px] font-bold text-emerald-500 uppercase">Paid</p>
-                             )}
-                          </div>
-                          <ArrowRight className="w-4 md:w-5 h-4 md:h-5 text-gray-200 group-hover:text-emerald-950 transition-colors" />
-                       </div>
+                      <div className="flex items-center gap-4 md:gap-8">
+                         <div className="text-right">
+                            <p className="text-sm md:text-lg font-black text-emerald-950 leading-none">৳ {order.totals?.total}</p>
+                            {order.totals?.due > 0 ? (
+                              <p className="text-[8px] md:text-[9px] font-bold text-amber-600 uppercase mt-1">Due ৳{order.totals.due}</p>
+                            ) : (
+                              <p className="text-[8px] md:text-[9px] font-bold text-emerald-500 uppercase mt-1">Paid</p>
+                            )}
+                         </div>
+                         <ArrowRight className="w-4 md:w-5 h-4 md:h-5 text-gray-200 group-hover:text-emerald-950 transition-colors" />
+                      </div>
                     </motion.div>
                   ))}
                 </div>

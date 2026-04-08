@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, ShoppingBag, PlusCircle, Settings, LogOut, Package, ClipboardList, Zap } from 'lucide-react';
+import React from 'react';
+import { LayoutDashboard, ShoppingBag, PlusCircle, Settings, LogOut, Package, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { db } from '../lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
 
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -18,35 +16,12 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [branding, setBranding] = useState({ name: 'anzaar', logo: '' });
-
-  useEffect(() => {
-    const unsub = onSnapshot(doc(db, "settings", "global"), (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setBranding({
-          name: data.siteName || 'anzaar',
-          logo: data.siteLogoUrl || ''
-        });
-      }
-    });
-    return () => unsub();
-  }, []);
 
   return (
     <aside className="w-full md:w-64 bg-emerald-950 text-white flex flex-col h-screen md:sticky md:top-0 border-r border-white/10">
-      <div className="p-8 flex items-center gap-3">
-        {branding.logo ? (
-          <img src={branding.logo} alt="Logo" className="w-10 h-10 object-contain" />
-        ) : (
-          <div className="w-10 h-10 bg-gold-400/20 rounded-xl flex items-center justify-center border border-gold-400/30">
-             <Zap className="w-6 h-6 text-gold-400" />
-          </div>
-        )}
-        <div>
-           <h1 className="text-2xl font-serif font-black text-gold-400 leading-none">{branding.name}</h1>
-           <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-black mt-1">Order Engine</p>
-        </div>
+      <div className="p-8">
+        <h1 className="text-2xl font-serif font-bold text-gold-400">anzaar</h1>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">Order Engine</p>
       </div>
 
       <nav className="flex-1 px-4 space-y-2">

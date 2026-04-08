@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   getProducts, 
-  createOrder,
-  getCustomerHistory
+  createOrder 
 } from '../lib/firebase-utils';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -20,9 +19,7 @@ import {
   CheckCircle2, 
   ChevronRight,
   Info,
-  RefreshCw,
-  Sparkles,
-  ExternalLink
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -43,7 +40,6 @@ export default function OrderForm({ onSuccess }) {
   });
 
   const [settings, setSettings] = useState(null);
-  const [history, setHistory] = useState([]);
 
   // Load Products & Settings
   useEffect(() => {
@@ -69,15 +65,6 @@ export default function OrderForm({ onSuccess }) {
     fetchData();
   }, []);
 
-  // Fetch Customer History on Phone Input
-  useEffect(() => {
-    if (order.customer.phone.length === 11) {
-      getCustomerHistory(order.customer.phone).then(setHistory);
-    } else {
-      setHistory([]);
-    }
-  }, [order.customer.phone]);
-
   // Selection state
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedVariantId, setSelectedVariantId] = useState('');
@@ -92,26 +79,6 @@ export default function OrderForm({ onSuccess }) {
     selectedProduct?.variants.find((_, idx) => idx.toString() === selectedVariantId),
   [selectedProduct, selectedVariantId]);
 
-  // Dynamic Extra Charge Calculation
-  const currentExtraCharge = useMemo(() => {
-    if (selectedSize !== 'Customize') return 0;
-    
-    let extra = 0;
-    const long = parseInt(customMeasures.long) || 0;
-    const body = parseInt(customMeasures.body) || 0;
-
-    // Long Logic
-    if (long > 62) extra += 450;
-    else if (long > 58) extra += 250;
-
-    // Body Logic
-    if (body > 48) extra += 250;
-
-    return extra;
-  }, [selectedSize, customMeasures]);
-
-  const currentDisplayPrice = (selectedProduct?.basePrice || 0) + currentExtraCharge;
-
   // Calculations
   const subtotal = useMemo(() => 
     order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
@@ -125,6 +92,7 @@ export default function OrderForm({ onSuccess }) {
     if (!selectedProduct || !selectedVariant) return toast.error("Select product and color first");
     if (!selectedSize) return toast.error("Select a size first");
 
+    let extraCharge = 0;
     let sizeText = selectedSize;
 
     if (selectedSize === 'Customize') {
@@ -133,15 +101,16 @@ export default function OrderForm({ onSuccess }) {
        const sleeve = parseInt(customMeasures.sleeve) || 0;
        const shoulder = parseInt(customMeasures.shoulder) || 0;
 
-       if (!long || !body || !sleeve) {
-         return toast.error("লং, বডি এবং হাতা কাস্টম সাইজের ক্ষেত্রে আবশ্যিক (Long, Body & Sleeve required)");
-       }
-
        if (body > 58) {
          return toast.error("বডি সর্বোচ্চ ৫৮ সাইজ পর্যন্ত দেওয়া যাবে (Body max limit 58)");
        }
 
-       sizeText = `Custom (L:${long}, B:${body}, Sl:${sleeve}${shoulder ? `, Sh:${shoulder}` : ''})`;
+       if (long > 62) extraCharge += 450;
+       else if (long > 58) extraCharge += 250;
+
+       if (body > 48) extraCharge += 250;
+
+       sizeText = `Custom (L:${long}, B:${body}, Sl:${sleeve}, Sh:${shoulder})`;
     }
 
     const newItem = {
@@ -149,8 +118,8 @@ export default function OrderForm({ onSuccess }) {
       name: selectedProduct.name,
       color: selectedVariant.color,
       size: sizeText,
-      price: currentDisplayPrice, // Use dynamically calculated price
-      extraCharge: currentExtraCharge,
+      price: selectedProduct.basePrice + extraCharge, // Final dynamically calculated price
+      extraCharge: extraCharge,
       image: selectedVariant.imageUrl,
       quantity: 1,
       sku: selectedVariant.sku,
@@ -166,32 +135,10 @@ export default function OrderForm({ onSuccess }) {
     setOrder({ ...order, items: order.items.filter(i => i.id !== id) });
   };
 
-  const validateTrxId = (method, trx) => {
-    if (!trx) return false;
-    const bkashPattern = /^[A-Z0-9]{10}$/; // 10 alphanumeric
-    const nagadPattern = /^[A-Z0-9]{8,12}$/i; // 8-12 alphanumeric
-    
-    if (method === 'Bkash') return bkashPattern.test(trx);
-    if (method === 'Nagad') return nagadPattern.test(trx);
-    return trx.length >= 6; // General for bank/other
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validations
-    if (!/^\d{11}$/.test(order.customer.phone)) {
-      return toast.error("Phone number must be exactly 11 digits (১১ ডিজিট হতে হবে)");
-    }
     if (order.items.length === 0) return toast.error("Add at least one item");
-    
-    if (order.payment.advancePaid) {
-      if (!order.payment.transactionId) return toast.error("Transaction ID required");
-      if (!validateTrxId(order.payment.method, order.payment.transactionId)) {
-        return toast.error(`${order.payment.method} Transaction ID ফরম্যাট সঠিক নয় (Invalid format)`);
-      }
-      if (order.payment.amount <= 0) return toast.error("Advance amount must be greater than 0");
-    }
+    if (order.payment.advancePaid && !order.payment.transactionId) return toast.error("Transaction ID required");
 
     setSubmitting(true);
     const toastId = toast.loading("Processing order...");
@@ -215,15 +162,14 @@ export default function OrderForm({ onSuccess }) {
         ...order,
         orderId: customOrderId, // Inject Custom Order ID
         totals: { subtotal, discount: discountAmount, delivery: order.delivery.charge, total, paid: order.payment.amount, due },
-        timestamp: new Date().toISOString(),
-        syncStatus: 'pending' // Flag for Google Sheets Sync
+        timestamp: new Date().toISOString()
       };
       
       const firebaseDocId = await createOrder({ ...orderData, id: customOrderId });
 
-      // 4. Trigger Google Sheets Sync (Async but awaited for UI reliability)
+      // 4. Trigger Google Sheets Sync
       try {
-        const syncResponse = await fetch('/api/sync-order', {
+        const res = await fetch('/api/sync-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -233,26 +179,20 @@ export default function OrderForm({ onSuccess }) {
             sheetTab: settings?.activeSheetTab || 'Sheet1'
           })
         });
-
-        if (syncResponse.ok) {
-          // Update Firestore status
-          const { db } = await import('../lib/firebase');
-          const { updateDoc, doc } = await import('firebase/firestore');
-          await updateDoc(doc(db, "orders", firebaseDocId), { syncStatus: 'synced' });
-          console.log("✅ Sheet Sync Successful");
-        } else {
-          console.error("❌ Sheet Sync Failed Status:", syncResponse.status);
-          toast.warning("Synced to Database, but Sheets connection failed.", { duration: 5000 });
+        
+        if (!res.ok) {
+           const errData = await res.json();
+           console.error("Sheets Error:", errData);
+           toast.warning(`Google Sheets Error: ${errData.error}`, { duration: 10000 });
         }
       } catch (syncErr) {
-        console.error("❌ Sheet Sync Network Exception:", syncErr);
-        toast.warning("Sync connection error. Use Dashboard to retry manual sync.");
+        console.error("Sheets sync failed:", syncErr);
+        toast.warning("Order saved, but Sheets sync failed. Please check logs.");
       }
 
-      const finalOrder = { ...orderData, id: firebaseDocId };
-      if (onSuccess) onSuccess(finalOrder);
+      toast.success(`Order #${customOrderId} placed successfully!`, { id: toastId });
       
-      // Reset form
+      // Reset form or redirect
       setOrder({
         customer: { name: '', phone: '', address: '', notes: '' },
         isUrgent: false,
@@ -261,6 +201,7 @@ export default function OrderForm({ onSuccess }) {
         discount: { ...order.discount },
         payment: { advancePaid: false, method: 'Bkash', transactionId: '', amount: 0 }
       });
+      if (onSuccess) onSuccess({ ...orderData, orderId: customOrderId, id: firebaseDocId });
 
       // 5. Log Activity
       await logActivity("Moderator", "Placed New Order", { orderId: customOrderId, customer: order.customer.name, total: orderData.totals.total });
@@ -301,14 +242,13 @@ export default function OrderForm({ onSuccess }) {
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Phone (11 Digits)</label>
+              <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Phone</label>
               <div className="relative">
                 <input 
                   type="tel" required
-                  maxLength={11}
                   value={order.customer.phone}
-                  onChange={e => setOrder({...order, customer: {...order.customer, phone: e.target.value.replace(/\D/g, '')}})}
-                  className={`w-full bg-gray-50 text-gray-900 border ${order.customer.phone && order.customer.phone.length !== 11 ? 'border-red-300 bg-red-50/10' : 'border-gray-100'} p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10`} 
+                  onChange={e => setOrder({...order, customer: {...order.customer, phone: e.target.value}})}
+                  className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10" 
                   placeholder="01XXXXXXXXX"
                 />
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
@@ -329,45 +269,6 @@ export default function OrderForm({ onSuccess }) {
               />
               <MapPin className="absolute left-3 top-4 w-4 h-4 text-gray-300" />
             </div>
-
-            {/* Customer Intelligence: History Panel */}
-            <AnimatePresence>
-              {history.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-emerald-950 text-white p-4 rounded-2xl border border-gold-400/20 shadow-xl mt-2 space-y-3"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-gold-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-gold-400">Loyal Member Insights</span>
-                    </div>
-                    <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full">{history.length} Orders Found</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-white/5 p-2 rounded-xl">
-                      <p className="text-[8px] font-bold text-white/40 uppercase">Total Spent</p>
-                      <p className="text-sm font-black text-white">৳ {history.reduce((sum, o) => sum + (o.totals?.total || 0), 0)}</p>
-                    </div>
-                    <div className="bg-white/5 p-2 rounded-xl">
-                      <p className="text-[8px] font-bold text-white/40 uppercase">Last Order</p>
-                      <p className="text-[10px] font-black text-white">{new Date(history[0].timestamp).toLocaleDateString('en-GB')}</p>
-                    </div>
-                  </div>
-
-                  <button 
-                    type="button"
-                    onClick={() => setOrder({...order, customer: { ...order.customer, address: history[0].customer.address }})}
-                    className="w-full bg-gold-500 hover:bg-gold-600 text-emerald-950 text-[10px] font-black py-2 rounded-xl transition-all flex items-center justify-center gap-2"
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                    Auto-fill Previous Address
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
             <div className="space-y-1 col-span-full">
               <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Special Notes</label>
               <textarea 
@@ -402,12 +303,12 @@ export default function OrderForm({ onSuccess }) {
 
              <select 
               value={selectedVariantId}
-              disabled={!selectedProductId || !selectedProduct?.variants}
+              disabled={!selectedProductId}
               onChange={e => setSelectedVariantId(e.target.value)}
               className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none disabled:opacity-50"
              >
                 <option value="">Select Color...</option>
-                {selectedProduct?.variants?.map((v, idx) => (
+                {selectedProduct?.variants.map((v, idx) => (
                   <option key={idx} value={idx}>{v.color}</option>
                 ))}
              </select>
@@ -436,22 +337,21 @@ export default function OrderForm({ onSuccess }) {
               >
                  <div className="space-y-1">
                    <label className="text-[10px] font-bold text-gray-500 uppercase">Long</label>
-                   <input type="number" placeholder='e.g. 56' value={customMeasures.long} onChange={e => setCustomMeasures({...customMeasures, long: e.target.value})} className="w-full p-2 text-xs text-emerald-950 rounded-lg border-emerald-200 border focus:outline-none"/>
+                   <input type="number" placeholder='e.g. 56' value={customMeasures.long} onChange={e => setCustomMeasures({...customMeasures, long: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
                  </div>
                  <div className="space-y-1">
                    <label className="text-[10px] font-bold text-gray-500 uppercase">Body</label>
-                   <input type="number" placeholder='Max 58' value={customMeasures.body} onChange={e => setCustomMeasures({...customMeasures, body: e.target.value})} className={`w-full p-2 text-xs text-emerald-950 rounded-lg border ${parseInt(customMeasures.body) > 58 ? 'border-red-400 focus:ring-red-400' : 'border-emerald-200'} focus:outline-none`}/>
+                   <input type="number" placeholder='Max 58' value={customMeasures.body} onChange={e => setCustomMeasures({...customMeasures, body: e.target.value})} className={`w-full p-2 text-xs rounded-lg border ${parseInt(customMeasures.body) > 58 ? 'border-red-400 focus:ring-red-400' : 'border-emerald-200'} focus:outline-none`}/>
                  </div>
                  <div className="space-y-1">
                    <label className="text-[10px] font-bold text-gray-500 uppercase">Sleeve</label>
-                   <input type="number" placeholder='e.g. 22' value={customMeasures.sleeve} onChange={e => setCustomMeasures({...customMeasures, sleeve: e.target.value})} className="w-full p-2 text-xs text-emerald-950 rounded-lg border-emerald-200 border focus:outline-none"/>
+                   <input type="number" placeholder='e.g. 22' value={customMeasures.sleeve} onChange={e => setCustomMeasures({...customMeasures, sleeve: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
                  </div>
                  <div className="space-y-1">
                    <label className="text-[10px] font-bold text-gray-500 uppercase">Shoulder</label>
-                   <input type="number" placeholder='e.g. 15' value={customMeasures.shoulder} onChange={e => setCustomMeasures({...customMeasures, shoulder: e.target.value})} className="w-full p-2 text-xs text-emerald-950 rounded-lg border-emerald-200 border focus:outline-none"/>
+                   <input type="number" placeholder='e.g. 15' value={customMeasures.shoulder} onChange={e => setCustomMeasures({...customMeasures, shoulder: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
                  </div>
-                 <div className="col-span-4 text-[10px] text-emerald-700 font-bold bg-white/50 p-2 rounded-lg border border-emerald-200/50 mt-1">
-                   <span className="text-red-500 mr-2 flex items-center gap-1"><Info className="w-3 h-3"/> AI Pricing Engine:</span>
+                 <div className="col-span-4 text-[10px] text-emerald-700 font-medium">
                    *Long &gt; 58 = +250 ৳ | Long &gt; 62 = +450 ৳ | Body &gt; 48 = +250 ৳ | Body limit: 58
                  </div>
               </motion.div>
@@ -469,14 +369,7 @@ export default function OrderForm({ onSuccess }) {
                 <div className="flex-1">
                    <h4 className="font-bold text-gray-900">{selectedProduct.name}</h4>
                    <p className="text-xs text-gray-500">{selectedVariant.color} • SKU: {selectedVariant.sku}</p>
-                   <div className="flex items-center gap-2">
-                     <p className="font-bold text-emerald-900">৳ {currentDisplayPrice}</p>
-                     {currentExtraCharge > 0 && (
-                       <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md uppercase tracking-tighter">
-                         Includes Size Surcharge (+৳{currentExtraCharge})
-                       </span>
-                     )}
-                   </div>
+                   <p className="font-bold text-emerald-900">৳ {selectedProduct.basePrice}</p>
                 </div>
                 <button 
                   type="button"
@@ -609,7 +502,7 @@ export default function OrderForm({ onSuccess }) {
                   required
                   value={order.payment.transactionId}
                   onChange={e => setOrder({...order, payment: {...order.payment, transactionId: e.target.value}})}
-                  className={`bg-white/10 border ${order.payment.transactionId && !validateTrxId(order.payment.method, order.payment.transactionId) ? 'border-red-400' : 'border-white/10'} p-2 rounded-lg text-xs placeholder:text-white/30 uppercase`}
+                  className="bg-white/10 border border-white/10 p-2 rounded-lg text-xs placeholder:text-white/30"
                  />
                  <div className="col-span-full">
                     <input 

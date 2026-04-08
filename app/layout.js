@@ -1,6 +1,10 @@
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Sidebar from "../components/Sidebar";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
 
 export const metadata = {
   title: "anzaar Order Engine | Premium Abaya Management",
@@ -10,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${inter.variable} ${playfair.variable} bg-gray-50 dark:bg-emerald-950 antialiased`}>
         <div className="min-h-screen flex flex-col md:flex-row">
           <Sidebar />
           {/* Main Content */}
