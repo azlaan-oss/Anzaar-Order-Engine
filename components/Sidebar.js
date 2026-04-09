@@ -38,7 +38,7 @@ export default function Sidebar() {
       <div className="md:hidden bg-emerald-950 p-4 flex items-center justify-between sticky top-0 z-[60] border-b border-white/5">
          <div className="flex items-center justify-between">
             {settings?.logoUrl ? (
-               <div className="flex flex-col items-start gap-0.5">
+               <Link href="/" className="active:scale-95 transition-transform">
                   <div className="h-7 w-auto flex items-center justify-center overflow-visible">
                      <img 
                         src={settings.logoUrl} 
@@ -50,13 +50,12 @@ export default function Sidebar() {
                         alt="Brand Logo" 
                      />
                   </div>
-                  <p className="text-[6px] uppercase tracking-[0.4em] text-white/20 leading-none pl-1 mt-1">Order Engine</p>
-               </div>
+               </Link>
             ) : (
-               <div className="flex flex-col">
+               <Link href="/" className="flex flex-col">
                   <h1 className="text-xl font-serif font-bold text-gold-400 leading-tight">anzaar</h1>
                   <p className="text-[8px] uppercase tracking-widest text-white/40">Order Engine</p>
-               </div>
+               </Link>
             )}
          </div>
          <button 
@@ -88,7 +87,7 @@ export default function Sidebar() {
       `}>
         <div className="p-8 hidden md:block">
            {settings?.logoUrl ? (
-              <div className="flex flex-col items-start gap-2">
+              <Link href="/" className="inline-block hover:opacity-80 transition-opacity active:scale-95">
                  <div className="h-10 w-auto flex items-center overflow-visible">
                     <img 
                        src={settings.logoUrl} 
@@ -100,14 +99,12 @@ export default function Sidebar() {
                        alt="Brand Logo" 
                     />
                  </div>
-                 <div className="w-10 h-0.5 bg-gold-400/5 rounded-full mt-1" />
-                 <p className="text-[8px] uppercase tracking-[0.4em] text-white/20 font-black italic">Management</p>
-              </div>
+              </Link>
            ) : (
-             <div>
+             <Link href="/" className="hover:opacity-80 transition-opacity">
                 <h1 className="text-2xl font-serif font-bold text-gold-400 leading-none">anzaar</h1>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold mt-1">Order Engine</p>
-             </div>
+             </Link>
            )}
         </div>
 
