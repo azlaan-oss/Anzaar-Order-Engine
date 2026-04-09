@@ -6,23 +6,31 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../lib/firebase';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '../lib/auth-context';
+import { ROLES, PERMISSIONS, hasPermission } from '../lib/permissions';
 
-const menuItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { name: 'New Order', icon: PlusCircle, path: '/orders/new' },
-  { name: 'Products', icon: Package, path: '/admin/products' },
-  { name: 'All Orders', icon: ClipboardList, path: '/admin/orders' },
-  { name: 'Spreadsheet', icon: FileSpreadsheet, path: '/admin/sheets' },
-  { name: 'Reports', icon: ClipboardList, path: '/admin/reports' },
-  { name: 'Trash', icon: Trash2, path: '/admin/trash' },
-  { name: 'Settings', icon: Settings, path: '/admin/settings' },
+const ALL_MENU_ITEMS = [
+  { name: 'Dashboard', icon: LayoutDashboard, path: '/', permission: PERMISSIONS.VIEW_VAULT },
+  { name: 'New Order', icon: PlusCircle, path: '/orders/new', permission: PERMISSIONS.CREATE_ORDER },
+  { name: 'Products', icon: Package, path: '/admin/products', permission: PERMISSIONS.VIEW_VAULT },
+  { name: 'All Orders', icon: ClipboardList, path: '/admin/orders', permission: PERMISSIONS.VIEW_ORDERS },
+  { name: 'Spreadsheet', icon: FileSpreadsheet, path: '/admin/sheets', permission: PERMISSIONS.EXPORT_DATA },
+  { name: 'Reports', icon: ClipboardList, path: '/admin/reports', permission: PERMISSIONS.VIEW_REPORTS },
+  { name: 'Trash', icon: Trash2, path: '/admin/trash', permission: PERMISSIONS.VIEW_TRASH },
+  { name: 'Access Control', icon: ShieldCheck, path: '/admin/access', permission: PERMISSIONS.MANAGE_USERS },
+  { name: 'Settings', icon: Settings, path: '/admin/settings', permission: PERMISSIONS.EDIT_SETTINGS },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
   const [settings, setSettings] = React.useState(null);
+  const { user, userData, logout } = useAuth();
+
+  const menuItems = ALL_MENU_ITEMS.filter(item => 
+    hasPermission(userData?.role, item.permission)
+  );
 
   React.useEffect(() => {
     // 1. Instantly load from cache to prevent flash
@@ -143,21 +151,26 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-6 border-t border-white/10 space-y-4">
-        <div className="flex items-center gap-3 px-2">
-           <div className="w-10 h-10 rounded-full bg-gold-400/20 border border-gold-400/30 flex items-center justify-center font-bold text-gold-400">
-             AZ
-           </div>
-           <div>
-             <p className="text-sm font-bold">Admin User</p>
-             <p className="text-[10px] text-white/40 uppercase">Senior Manager</p>
-           </div>
-        </div>
+        {userData && (
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-10 h-10 rounded-full bg-gold-400/20 border border-gold-400/30 flex items-center justify-center font-bold text-gold-400 font-serif">
+              {userData.name?.[0] || user?.email?.[0]?.toUpperCase()}
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-sm font-bold truncate text-white">{userData.name || 'Agent'}</p>
+              <div className="flex items-center gap-1">
+                 <div className={`w-1 h-1 rounded-full ${userData.role === ROLES.SUPER_ADMIN ? 'bg-gold-400' : 'bg-emerald-400'}`} />
+                 <p className="text-[9px] text-white/40 uppercase tracking-widest truncate">{userData.role?.replace('_', ' ')}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <button 
-          onClick={() => window.location.reload()}
-          className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-all text-sm font-bold w-full px-2"
+          onClick={logout}
+          className="flex items-center gap-2 text-white/40 hover:text-red-400 transition-all text-[10px] font-black uppercase tracking-widest w-full px-2"
         >
           <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <span>Exit Vault</span>
         </button>
       </div>
     </aside>
