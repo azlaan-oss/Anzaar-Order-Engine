@@ -34,39 +34,56 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
     }
   }, [editData]);
 
-  const [newVariant, setNewVariant] = useState({ 
-    color: '', 
-    image: null, 
-    preview: '',
-    stock: '',
-    threshold: '2'
-  });
+  const extractColor = (filename) => {
+    // Remove extension
+    const nameWithoutExt = filename.split('.').slice(0, -1).join('.');
+    // Replace hyphens, underscores with spaces, and capitalize words
+    return nameWithoutExt
+      .replace(/[-_]/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
 
   const handleAddVariant = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
-    const compressed = await compressImage(file);
-    const preview = URL.createObjectURL(compressed);
-    setNewVariant({ ...newVariant, image: compressed, preview });
-  };
+    const toastId = toast.loading(`Processing ${files.length} image${files.length > 1 ? 's' : ''}...`);
+    
+    try {
+      const processedVariants = await Promise.all(
+        files.map(async (file) => {
+          const compressed = await compressImage(file);
+          const preview = URL.createObjectURL(compressed);
+          const colorName = extractColor(file.name);
 
-  const confirmAddVariant = () => {
-    if (!newVariant.color || (!newVariant.image && !newVariant.imageUrl)) {
-      toast.error('Please add color name and image');
-      return;
+          return { 
+            id: Date.now() + Math.random(),
+            color: colorName, 
+            image: compressed, 
+            preview,
+            stock: 0,
+            threshold: 2
+          };
+        })
+      );
+
+      setProduct(prev => ({
+        ...prev,
+        variants: [...prev.variants, ...processedVariants]
+      }));
+      
+      toast.success(`Added ${files.length} color variant${files.length > 1 ? 's' : ''}`, { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Processing failed', { id: toastId });
+    } finally {
+      e.target.value = ''; // Reset input
     }
-    setProduct({
-      ...product,
-      variants: [...product.variants, { 
-        ...newVariant, 
-        id: Date.now() + Math.random(),
-        stock: parseInt(newVariant.stock) || 0,
-        threshold: parseInt(newVariant.threshold) || 2
-      }]
-    });
-    setNewVariant({ color: '', image: null, preview: '', stock: '', threshold: '2' });
   };
+
 
   const removeVariant = (id) => {
     setProduct({
@@ -102,13 +119,21 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
   }, [activeVariantIdx, product.variants]);
 
   const handleDelete = async () => {
+    console.log("DEBUG: Deleting product with data:", editData);
+    if (!editData?.id) {
+      toast.error("Invalid product ID");
+      return;
+    }
     if (!window.confirm("Are you sure? This product and all its variants will be moved to the Trash Vault for 7 days.")) return;
     setLoading(true);
     try {
-      await deleteProduct(editData.id);
+      const idToDelete = product.id || editData?.id;
+      await deleteProduct(idToDelete);
       toast.success("Product deleted from vault");
       if (onSuccess) onSuccess();
     } catch (err) {
+      console.error("Deletion error:", err);
+      window.alert("Deletion Error: " + err.message);
       toast.error("Deletion failed: " + err.message);
     } finally {
       setLoading(false);
@@ -261,10 +286,11 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
                  </div>
                 <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-md p-3">
                    <p className="text-[10px] font-black text-emerald-950 text-center uppercase tracking-tighter truncate">{v.color}</p>
-                   <div className="flex justify-center gap-2 mt-1">
-                      <span className="text-[8px] font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full">S: {v.stock}</span>
-                      <span className="text-[8px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-full">M: {v.threshold}</span>
-                   </div>
+                    {/* Stock removed per request */}
+                    {/* <div className="flex justify-center gap-2 mt-1">
+                       <span className="text-[8px] font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full">S: {v.stock}</span>
+                       <span className="text-[8px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-full">M: {v.threshold}</span>
+                    </div> */}
                 </div>
               </motion.div>
             ))}
@@ -272,83 +298,25 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
 
           {/* Add New Variant Box */}
           <div className="w-36 h-48 border-4 border-dashed border-gray-50 rounded-[2.5rem] flex flex-col items-center justify-center gap-3 bg-gray-50/30 hover:bg-emerald-50 hover:border-emerald-100 transition-all relative group">
-            {newVariant.preview ? (
-              <div className="absolute inset-0 p-2">
-                <img src={newVariant.preview} className="w-full h-full object-cover rounded-[2rem] shadow-lg" />
-                <button 
-                  type="button"
-                  onClick={() => setNewVariant({ ...newVariant, image: null, preview: '' })}
-                  className="absolute top-4 right-4 bg-white/90 text-red-500 p-2 rounded-xl shadow-lg hover:bg-red-500 hover:text-white transition-all"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                   <Upload className="w-6 h-6" />
-                </div>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={handleAddVariant}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Color Image</span>
-              </>
-            )}
+            <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all">
+               <Upload className="w-6 h-6" />
+            </div>
+            <input 
+              type="file" 
+              accept="image/*"
+              multiple
+              onChange={handleAddVariant}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center px-4">
+              Upload Color Tones<br/>
+              <span className="text-[8px] opacity-60">(Multi-select enabled)</span>
+            </span>
           </div>
         </div>
 
         {/* Variant Inputs Row */}
         <AnimatePresence>
-          {newVariant.preview && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="flex flex-wrap items-center gap-4 bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100"
-            >
-              <div className="flex-1 min-w-[150px]">
-                <input 
-                  type="text"
-                  placeholder="Color Name"
-                  value={newVariant.color}
-                  onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value })}
-                  onKeyDown={(e) => { if (e.key === 'Enter') confirmAddVariant(); }}
-                  className="w-full bg-white text-emerald-950 border border-emerald-100 p-3 rounded-xl text-xs font-bold focus:outline-none"
-                />
-              </div>
-              <div className="w-24">
-                <input 
-                  type="number"
-                  placeholder="Stock"
-                  value={newVariant.stock}
-                  onChange={(e) => setNewVariant({ ...newVariant, stock: e.target.value })}
-                  onKeyDown={(e) => { if (e.key === 'Enter') confirmAddVariant(); }}
-                  className="w-full bg-white text-emerald-950 border border-emerald-100 p-3 rounded-xl text-xs font-bold focus:outline-none"
-                />
-              </div>
-              <div className="w-20">
-                <input 
-                  type="number"
-                  placeholder="Alert At"
-                  value={newVariant.threshold}
-                  onChange={(e) => setNewVariant({ ...newVariant, threshold: e.target.value })}
-                  onKeyDown={(e) => { if (e.key === 'Enter') confirmAddVariant(); }}
-                  className="w-full bg-white text-emerald-950 border border-emerald-100 p-3 rounded-xl text-xs font-bold focus:outline-none"
-                />
-              </div>
-              <button 
-                type="button"
-                onClick={confirmAddVariant}
-                className="bg-emerald-900 text-white px-4 py-3 rounded-xl shadow-lg hover:bg-emerald-950 transition-all flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="text-[9px] font-black uppercase">Add to List</span>
-              </button>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
 
@@ -459,7 +427,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
                         />
                      </div>
 
-                     <div className="grid grid-cols-2 gap-6">
+                     <div className="hidden grid grid-cols-2 gap-6">
                         <div className="space-y-3">
                            <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest pl-1">In Stock</label>
                            <input 

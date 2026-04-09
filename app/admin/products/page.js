@@ -65,10 +65,8 @@ export default function ProductsPage() {
     const totalVariants = products.reduce((acc, p) => acc + (p.variants?.length || 0), 0);
     const uniqueCategories = [...new Set(products.map(p => p.category))].length;
     
-    // Low stock calculation
-    const lowStockItems = products.filter(p => 
-      p.variants?.some(v => v.stock <= (v.threshold || 2))
-    ).length;
+    // Low stock calculation removed
+    const lowStockItems = 0;
 
     // Mock Sales Data for Graph
     const salesData = [
@@ -128,10 +126,10 @@ export default function ProductsPage() {
         document.body
       )}
 
-      <div className="max-w-7xl mx-auto space-y-12 pb-20 px-4">
+      <div className="max-w-[1600px] mx-auto space-y-8 pb-10 px-6">
       
       {/* Premium Hub Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
              <Link href="/" className="p-2 bg-white border border-gray-100 rounded-xl hover:bg-emerald-50 text-emerald-950 transition-all shadow-sm">
@@ -145,9 +143,9 @@ export default function ProductsPage() {
 
          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-2">
-               <h1 className="text-5xl font-serif font-black text-emerald-950 tracking-tight">The Product Vault</h1>
+               <h1 className="text-3xl font-serif font-black text-emerald-950 tracking-tight">The Product Vault</h1>
                <div className="flex items-center gap-3">
-                  <span className="w-12 h-1 bg-gold-500 rounded-full" />
+                  <span className="w-8 h-1 bg-gold-500 rounded-full" />
                   <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.3em]">Master Inventory Control</p>
                </div>
             </div>
@@ -186,12 +184,12 @@ export default function ProductsPage() {
                  />
               </div>
               <div className="space-y-6">
-                 <div className="bg-emerald-950 p-8 rounded-[3rem] text-white space-y-4 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+                 <div className="bg-emerald-950 p-6 rounded-[2rem] text-white space-y-4 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-10">
                        <Zap className="w-24 h-24" />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">Inventory Health</p>
-                    <h3 className="text-3xl font-serif font-black tracking-tighter">Optimal Flow</h3>
+                    <h3 className="text-2xl font-serif font-black tracking-tight">Optimal Flow</h3>
                     <div className="pt-4 flex items-center gap-4">
                        <span className="text-4xl font-black">{Math.round((stats.count / 50) * 100)}%</span>
                        <p className="text-[10px] font-bold text-emerald-200 uppercase leading-relaxed">
@@ -200,47 +198,36 @@ export default function ProductsPage() {
                     </div>
                  </div>
 
-                 <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between">
-                       <div className="bg-amber-50 text-amber-600 p-3 rounded-2xl">
-                          <AlertTriangle className="w-5 h-5" />
-                       </div>
-                       <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full">High Priority</span>
-                    </div>
-                    <div>
-                       <h4 className="text-xl font-black text-emerald-950">{stats.lowStock} Low Stock Items</h4>
-                       <p className="text-[10px] font-bold text-gray-400 uppercase mt-1">Requiring immediate replenishment</p>
-                    </div>
-                 </div>
+                  {/* Health card removed per request */}
               </div>
            </div>
 
            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
                  <div className="bg-emerald-50 text-emerald-950 p-4 rounded-2xl">
                     <PackageCheck className="w-6 h-6" />
                  </div>
                  <div>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Master Units</p>
-                    <h3 className="text-2xl font-black text-emerald-950">{stats.count} Products</h3>
+                    <h3 className="text-xl font-black text-emerald-950">{stats.count} Products</h3>
                  </div>
               </div>
-              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
                  <div className="bg-amber-50 text-amber-600 p-4 rounded-2xl">
                     <Palette className="w-6 h-6" />
                  </div>
                  <div>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Variations</p>
-                    <h3 className="text-2xl font-black text-emerald-950">{stats.variants} SKUs</h3>
+                    <h3 className="text-xl font-black text-emerald-950">{stats.variants} SKUs</h3>
                  </div>
               </div>
-              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
                  <div className="bg-purple-50 text-purple-600 p-4 rounded-2xl">
                     <Layers className="w-6 h-6" />
                  </div>
                  <div>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Series</p>
-                    <h3 className="text-2xl font-black text-emerald-950">{stats.categories} Collections</h3>
+                    <h3 className="text-xl font-black text-emerald-950">{stats.categories} Collections</h3>
                  </div>
               </div>
            </div>
@@ -248,7 +235,7 @@ export default function ProductsPage() {
       )}
 
       {/* Product List Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && products.length === 0 ? (
           Array(6).fill(0).map((_, i) => (
              <div key={i} className="h-96 bg-gray-50 rounded-[3rem] animate-pulse" />
@@ -285,11 +272,7 @@ export default function ProductsPage() {
                       <span className="bg-emerald-950/80 backdrop-blur-md text-[10px] font-bold text-gold-400 px-3 py-1.5 rounded-full uppercase tracking-widest shadow-xl">
                         {product.category || 'Luxury'}
                       </span>
-                      {product.variants?.some(v => v.stock <= (v.threshold || 2)) && (
-                         <span className="bg-red-500 text-white text-[8px] font-black px-2 py-1 rounded-full uppercase animate-pulse">
-                            Low Stock
-                         </span>
-                      )}
+                      {/* Low stock badge removed */}
                    </div>
                    <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg">
                       <Sparkles className="w-3 h-3 text-gold-500" />
@@ -313,34 +296,34 @@ export default function ProductsPage() {
                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
-            <div className="p-8 space-y-6 flex-1 flex flex-col">
+            <div className="p-5 space-y-4 flex-1 flex flex-col">
               <div className="space-y-1">
-                <h3 className="font-serif font-black text-emerald-950 text-2xl uppercase tracking-tighter leading-tight group-hover:text-emerald-800 transition-colors">
+                <h3 className="font-serif font-black text-emerald-950 text-xl uppercase tracking-tighter leading-tight group-hover:text-emerald-800 transition-colors">
                    {product.name}
                 </h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inventory Reference: {String(product.id).substring(0, 8)}</p>
+                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Ref: {String(product.id).substring(0, 8)}</p>
               </div>
               
-              <div className="flex-1 flex flex-col justify-end space-y-4">
-                 <div className="flex items-center gap-3">
-                    <div className="flex -space-x-3">
+              <div className="flex-1 flex flex-col justify-end space-y-3">
+                 <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
                        {product.variants.slice(0, 4).map((v, i) => (
                           <div 
                             key={i}
-                            className="w-10 h-10 rounded-full border-4 border-white overflow-hidden shadow-lg"
+                            className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-lg"
                             title={v.color}
                           >
                              <img src={v.imageUrl} className="w-full h-full object-cover" />
                           </div>
                        ))}
                        {product.variants.length > 4 && (
-                          <div className="w-10 h-10 rounded-full bg-emerald-50 border-4 border-white flex items-center justify-center text-[10px] font-black text-emerald-900 shadow-lg">
+                          <div className="w-8 h-8 rounded-full bg-emerald-50 border-2 border-white flex items-center justify-center text-[8px] font-black text-emerald-900 shadow-lg">
                              +{product.variants.length - 4}
                           </div>
                        )}
                     </div>
-                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                       {product.variants.length} Tones Available
+                    <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+                       {product.variants.length} Tones
                     </div>
                  </div>
 
