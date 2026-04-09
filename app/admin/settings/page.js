@@ -38,6 +38,7 @@ export default function SettingsPage() {
     orderSequence: 1,
     deliveryRates: { inside: 80, outside: 150 },
     logoUrl: '',
+    logoScale: 1.5,
     campaigns: [
       { name: 'None', percentage: 0 },
       { name: 'Eid Promo', percentage: 5 },
@@ -286,6 +287,29 @@ export default function SettingsPage() {
                           />
                        </label>
                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Recommended: Square Format (PNG/JPG)</p>
+
+                       {settings.logoUrl && (
+                         <div className="w-full max-w-xs space-y-4 pt-4 border-t border-emerald-100/50">
+                            <div className="flex items-center justify-between">
+                               <label className="text-[10px] font-black uppercase tracking-widest text-emerald-900/50">Engine Logo Scale</label>
+                               <span className="text-[10px] font-black text-emerald-950 bg-emerald-100 px-2 py-1 rounded-lg">{(settings.logoScale || 1.5).toFixed(1)}x</span>
+                            </div>
+                            <input 
+                              type="range" 
+                              min="0.5" 
+                              max="3" 
+                              step="0.1"
+                              value={settings.logoScale || 1.5}
+                              onChange={e => setSettings({...settings, logoScale: parseFloat(e.target.value)})}
+                              className="w-full h-2 bg-emerald-100 rounded-lg appearance-none cursor-pointer accent-emerald-900"
+                            />
+                            <div className="flex justify-between text-[8px] font-bold text-gray-300 uppercase">
+                               <span>Small</span>
+                               <span>Standard</span>
+                               <span>Extra Large</span>
+                            </div>
+                         </div>
+                       )}
                     </div>
                   </div>
                 )}

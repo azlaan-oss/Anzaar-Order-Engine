@@ -42,8 +42,11 @@ export default function Sidebar() {
                   <div className="h-7 w-auto flex items-center justify-center overflow-visible">
                      <img 
                         src={settings.logoUrl} 
-                        className="h-full w-auto object-contain brightness-150 scale-[1.2] origin-left ml-1" 
-                        style={{ mixBlendMode: 'screen' }} 
+                        className="h-full w-auto object-contain brightness-150 origin-left ml-1" 
+                        style={{ 
+                          mixBlendMode: 'screen',
+                          transform: `scale(${settings.logoScale ? settings.logoScale * 0.8 : 1.2})` 
+                        }} 
                         alt="Brand Logo" 
                      />
                   </div>
@@ -89,8 +92,11 @@ export default function Sidebar() {
                  <div className="h-10 w-auto flex items-center overflow-visible">
                     <img 
                        src={settings.logoUrl} 
-                       className="h-full w-auto object-contain brightness-125 scale-[1.5] origin-left ml-2" 
-                       style={{ mixBlendMode: 'screen' }} 
+                       className="h-full w-auto object-contain brightness-125 origin-left ml-2 transition-transform duration-300" 
+                       style={{ 
+                          mixBlendMode: 'screen',
+                          transform: `scale(${settings.logoScale || 1.5})` 
+                       }} 
                        alt="Brand Logo" 
                     />
                  </div>
