@@ -119,22 +119,29 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
   }, [activeVariantIdx, product.variants]);
 
   const handleDelete = async () => {
-    console.log("DEBUG: Deleting product with data:", editData);
-    if (!editData?.id) {
-      toast.error("Invalid product ID");
+    const idToDelete = product.id || editData?.id;
+    console.log("[DELETE-PROCESS] Initiated deletion for:", { 
+      product_id: product.id, 
+      editData_id: editData?.id, 
+      idToDelete 
+    });
+
+    if (!idToDelete) {
+      toast.error("Invalid product identifier - check console");
       return;
     }
+
     if (!window.confirm("Are you sure? This product and all its variants will be moved to the Trash Vault for 7 days.")) return;
+    
     setLoading(true);
     try {
-      const idToDelete = product.id || editData?.id;
       await deleteProduct(idToDelete);
-      toast.success("Product deleted from vault");
+      toast.success("Product successfully removed from vault");
       if (onSuccess) onSuccess();
     } catch (err) {
-      console.error("Deletion error:", err);
-      window.alert("Deletion Error: " + err.message);
-      toast.error("Deletion failed: " + err.message);
+      console.error("[DELETE-PROCESS] Error:", err);
+      window.alert("Critical Vault Error: " + err.message);
+      toast.error("Deletion rejected: " + err.message);
     } finally {
       setLoading(false);
     }

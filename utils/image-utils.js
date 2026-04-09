@@ -2,9 +2,10 @@ import imageCompression from 'browser-image-compression';
 
 export const compressImage = async (file) => {
   const options = {
-    maxSizeMB: 0.2, // ~200KB
-    maxWidthOrHeight: 1024,
+    maxSizeMB: 0.06, // ~60KB - target for Firestore document limits
+    maxWidthOrHeight: 800, // Reduced from 1024 for better density
     useWebWorker: true,
+    fileType: 'image/jpeg', // Ensure consistent size
   };
 
   try {
