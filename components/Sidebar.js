@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { LayoutDashboard, ShoppingBag, PlusCircle, Settings, LogOut, Package, ClipboardList, FileSpreadsheet, Trash2, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, PlusCircle, Settings, LogOut, Package, ClipboardList, FileSpreadsheet, Trash2, Menu, X, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
