@@ -38,16 +38,16 @@ export default function Sidebar() {
       <div className="md:hidden bg-emerald-950 p-4 flex items-center justify-between sticky top-0 z-[60] border-b border-white/5">
          <div className="flex items-center justify-between">
             {settings?.logoUrl ? (
-               <div className="flex flex-col items-start gap-1">
-                  <div className="h-8 w-auto flex items-center justify-center overflow-visible">
+               <div className="flex flex-col items-start gap-0.5">
+                  <div className="h-7 w-auto flex items-center justify-center overflow-visible">
                      <img 
                         src={settings.logoUrl} 
-                        className="h-full w-auto object-contain brightness-150 scale-[2.2] origin-left ml-2" 
+                        className="h-full w-auto object-contain brightness-150 scale-[1.2] origin-left ml-1" 
                         style={{ mixBlendMode: 'screen' }} 
                         alt="Brand Logo" 
                      />
                   </div>
-                  <p className="text-[7px] uppercase tracking-[0.4em] text-white/20 leading-none pl-1 mt-1">Order Engine</p>
+                  <p className="text-[6px] uppercase tracking-[0.4em] text-white/20 leading-none pl-1 mt-1">Order Engine</p>
                </div>
             ) : (
                <div className="flex flex-col">
@@ -85,17 +85,17 @@ export default function Sidebar() {
       `}>
         <div className="p-8 hidden md:block">
            {settings?.logoUrl ? (
-              <div className="flex flex-col items-start gap-3">
+              <div className="flex flex-col items-start gap-2">
                  <div className="h-10 w-auto flex items-center overflow-visible">
                     <img 
                        src={settings.logoUrl} 
-                       className="h-full w-auto object-contain brightness-150 scale-[2.5] origin-left ml-4" 
+                       className="h-full w-auto object-contain brightness-125 scale-[1.5] origin-left ml-2" 
                        style={{ mixBlendMode: 'screen' }} 
                        alt="Brand Logo" 
                     />
                  </div>
-                 <div className="w-12 h-0.5 bg-gold-400/10 rounded-full mt-2" />
-                 <p className="text-[9px] uppercase tracking-[0.4em] text-white/20 font-black italic">Management</p>
+                 <div className="w-10 h-0.5 bg-gold-400/5 rounded-full mt-1" />
+                 <p className="text-[8px] uppercase tracking-[0.4em] text-white/20 font-black italic">Management</p>
               </div>
            ) : (
              <div>
