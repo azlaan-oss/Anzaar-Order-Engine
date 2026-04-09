@@ -25,9 +25,23 @@ export default function Sidebar() {
   const [settings, setSettings] = React.useState(null);
 
   React.useEffect(() => {
+    // 1. Instantly load from cache to prevent flash
+    const cached = localStorage.getItem('anzaar_branding');
+    if (cached) {
+      try {
+        setSettings(JSON.parse(cached));
+      } catch (e) {
+        console.error("Cache restore failed", e);
+      }
+    }
+
+    // 2. Sync with Firestore for real-time updates
     return onSnapshot(doc(db, "settings", "global"), (doc) => {
       if (doc.exists()) {
-        setSettings(doc.data());
+        const data = doc.data();
+        setSettings(data);
+        // Persist for next reload
+        localStorage.setItem('anzaar_branding', JSON.stringify(data));
       }
     });
   }, []);
@@ -52,9 +66,8 @@ export default function Sidebar() {
                   </div>
                </Link>
             ) : (
-               <Link href="/" className="flex flex-col">
-                  <h1 className="text-xl font-serif font-bold text-gold-400 leading-tight">anzaar</h1>
-                  <p className="text-[8px] uppercase tracking-widest text-white/40">Order Engine</p>
+               <Link href="/" className="flex flex-col h-7 justify-center">
+                  <div className="w-20 h-4 bg-white/5 rounded-full animate-pulse md:hidden" />
                </Link>
             )}
          </div>
@@ -101,9 +114,8 @@ export default function Sidebar() {
                  </div>
               </Link>
            ) : (
-             <Link href="/" className="hover:opacity-80 transition-opacity">
-                <h1 className="text-2xl font-serif font-bold text-gold-400 leading-none">anzaar</h1>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold mt-1">Order Engine</p>
+             <Link href="/" className="inline-block">
+                <div className="w-32 h-8 bg-white/5 rounded-2xl animate-pulse hidden md:block" />
              </Link>
            )}
         </div>
