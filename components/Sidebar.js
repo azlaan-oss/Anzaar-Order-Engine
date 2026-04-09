@@ -149,30 +149,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      <div className="p-6 border-t border-white/10 space-y-4">
-        {userData && (
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-gold-400/20 border border-gold-400/30 flex items-center justify-center font-bold text-gold-400 font-serif">
-              {userData.name?.[0] || user?.email?.[0]?.toUpperCase()}
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-bold truncate text-white">{userData.name || 'Agent'}</p>
-              <div className="flex items-center gap-1">
-                 <div className={`w-1 h-1 rounded-full ${userData.role === ROLES.SUPER_ADMIN ? 'bg-gold-400' : 'bg-emerald-400'}`} />
-                 <p className="text-[9px] text-white/40 uppercase tracking-widest truncate">{userData.role?.replace('_', ' ')}</p>
-              </div>
-            </div>
-          </div>
-        )}
-        <button 
-          onClick={logout}
-          className="flex items-center gap-2 text-white/40 hover:text-red-400 transition-all text-[10px] font-black uppercase tracking-widest w-full px-2"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Exit Vault</span>
-        </button>
-      </div>
     </aside>
     </>
   );

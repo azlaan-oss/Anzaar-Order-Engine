@@ -7,6 +7,7 @@ import PWA from "../components/PWA";
 import ConfigCheck from "../components/ConfigCheck";
 import { AuthProvider } from "../lib/auth-context";
 import RouteGuard from "../components/RouteGuard";
+import Header from "../components/Header";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" });
@@ -26,16 +27,19 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} bg-gray-50 dark:bg-emerald-950 antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} bg-gray-50 dark:bg-emerald-950 antialiased relative`}>
         <AuthProvider>
           <RouteGuard>
             <ConfigCheck />
             <PWA />
-            <div className="min-h-screen flex flex-col md:flex-row">
+            <div className="min-h-screen flex flex-col md:flex-row w-full">
               <Sidebar />
-              <main className="flex-1 p-4 md:p-8 overflow-x-hidden pt-20 md:pt-8 bg-white dark:bg-emerald-950/20">
-                {children}
-              </main>
+              <div className="flex-1 flex flex-col min-h-screen bg-gray-50/50 dark:bg-emerald-950/20 w-full overflow-x-hidden pt-20 md:pt-0">
+                 <Header />
+                 <main className="flex-1 p-4 md:p-8">
+                   {children}
+                 </main>
+              </div>
             </div>
             <BottomNav />
           </RouteGuard>
