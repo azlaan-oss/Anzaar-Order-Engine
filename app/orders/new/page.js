@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useRef, useState } from 'react';
 import OrderForm from '../../../components/OrderForm';
 import { ArrowLeft, FileText, Download, CheckCircle2, Share2, Sparkles, PlusCircle } from 'lucide-react';
