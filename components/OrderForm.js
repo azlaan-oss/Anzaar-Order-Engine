@@ -154,6 +154,7 @@ export default function OrderForm({ onSuccess }) {
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedVariantId, setSelectedVariantId] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
+  const [customColorName, setCustomColorName] = useState('');
   const [customMeasures, setCustomMeasures] = useState({ long: '', body: '', sleeve: '', shoulder: '' });
 
   const selectedProduct = useMemo(() => 
@@ -174,9 +175,10 @@ export default function OrderForm({ onSuccess }) {
   const due = total - order.payment.amount;
 
   const addItemToStage = () => {
-    if (!selectedProduct || !selectedVariant) return toast.error("Select product and color first");
+    if (!selectedProduct || !selectedVariantId) return toast.error("Select product and color first");
+    if (selectedVariantId === 'custom' && !customColorName) return toast.error("Enter custom color name");
     if (selectedProduct.isStockOut) return toast.error("This product is currently Stock Out");
-    if (selectedVariant.isStockOut) return toast.error("This color variation is currently Stock Out");
+    if (selectedVariantId !== 'custom' && selectedVariant.isStockOut) return toast.error("This color variation is currently Stock Out");
     if (!selectedSize) return toast.error("Select a size first");
 
     let extraCharge = 0;
@@ -199,21 +201,23 @@ export default function OrderForm({ onSuccess }) {
     const newItem = {
       productId: selectedProduct.id,
       name: selectedProduct.name,
-      color: selectedVariant.color,
+      color: selectedVariantId === 'custom' ? customColorName : selectedVariant.color,
       size: sizeText,
       price: selectedProduct.basePrice + extraCharge,
       extraCharge: extraCharge,
-      image: selectedVariant.imageUrl,
+      image: selectedVariantId === 'custom' ? (selectedProduct.variants[0]?.imageUrl || '') : selectedVariant.imageUrl,
       quantity: 1,
-      sku: selectedVariant.sku,
+      sku: selectedVariantId === 'custom' ? `${selectedProduct.id}-CUSTOM` : selectedVariant.sku,
       id: Date.now()
     };
     
     setStagedItems([...stagedItems, newItem]);
     
     // Reset Selection After Adding
+    setSelectedProductId('');
     setSelectedVariantId('');
     setSelectedSize('');
+    setCustomColorName('');
     setCustomMeasures({ long: '', body: '', sleeve: '', shoulder: '' });
   };
 
@@ -542,7 +546,7 @@ export default function OrderForm({ onSuccess }) {
             </div>
         </section>
 
-        {/* Section: Product Smart Selector */}
+        {/* Section: Product Selector */}
         <section className={`glass-panel p-6 rounded-[2.5rem] space-y-6 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
            <div className="flex items-center gap-2 mb-2">
               <div className="bg-zinc-950/5 p-2 rounded-lg text-zinc-950">
@@ -591,8 +595,8 @@ export default function OrderForm({ onSuccess }) {
                            key={p.id}
                            onClick={() => {
                              setSelectedProductId(p.id);
-                             setSelectedVariantId('0'); // Auto-select first variant
-                             setSelectedSize('52/42/21 (S)');  // Auto-select first size
+                             setSelectedVariantId(''); 
+                             setSelectedSize(''); 
                              setProductSearch('');
                              setIsProductListOpen(false);
                            }}
@@ -617,6 +621,7 @@ export default function OrderForm({ onSuccess }) {
               onChange={e => setSelectedVariantId(e.target.value)}
               className="w-full bg-white text-zinc-950 font-black border border-black/5 p-3 rounded-xl focus:outline-none disabled:opacity-20"
              >
+                <option value="" disabled>Select Color</option>
                 {selectedProduct?.variants.map((v, idx) => (
                   <option 
                     key={idx} 
@@ -627,6 +632,7 @@ export default function OrderForm({ onSuccess }) {
                     {v.color} {v.isStockOut ? '(Stock Out)' : ''}
                   </option>
                 ))}
+                <option value="custom" className="text-blue-600 font-bold">+ Custom / Other Color</option>
              </select>
 
              <select 
@@ -635,12 +641,33 @@ export default function OrderForm({ onSuccess }) {
               onChange={e => setSelectedSize(e.target.value)}
               className="w-full md:col-span-2 bg-white text-zinc-950 font-black border border-black/5 p-4 rounded-2xl focus:outline-none disabled:opacity-20 appearance-none"
              >
+                 <option value="" disabled>Select Size</option>
                  <option value="52/42/21 (S)">52/42/21 (S)</option>
                  <option value="54/44/22 (M)">54/44/22 (M)</option>
                  <option value="56/46/23 (L)">56/46/23 (L)</option>
                  <option value="Customize">Customize Size</option>
              </select>
           </div>
+
+          <AnimatePresence>
+            {selectedVariantId === 'custom' && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-1"
+              >
+                <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest pl-2">Requested Color Name</label>
+                <input 
+                  type="text"
+                  value={customColorName}
+                  onChange={e => setCustomColorName(e.target.value)}
+                  className="w-full bg-white text-zinc-950 border border-blue-100 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500/10 focus:outline-none placeholder:text-zinc-300 font-black uppercase"
+                  placeholder="e.g. Lavender, Sea Green..."
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <AnimatePresence>
             {selectedSize === 'Customize' && (
@@ -686,7 +713,7 @@ export default function OrderForm({ onSuccess }) {
                  <div className="flex-1">
                     <h4 className="font-black text-zinc-950 text-base leading-tight uppercase tracking-tighter">{selectedProduct.name}</h4>
                     <p className="text-[9px] text-zinc-400 font-black uppercase tracking-widest mt-1">
-                      {selectedVariant.color} • SKU: {selectedVariant.sku}
+                      {selectedVariantId === 'custom' ? customColorName : selectedVariant.color} • SKU: {selectedVariant.sku}
                     </p>
                     <p className="text-xl font-black text-zinc-950 mt-1 uppercase tracking-tighter">৳ {selectedProduct.basePrice}</p>
                  </div>
