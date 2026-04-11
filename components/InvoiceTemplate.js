@@ -168,30 +168,27 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
             </div>
           </div>
 
-          {/* ── CARD 2: Color Variance — Visual Side-by-Side Swatch Hack ── */}
+          {/* ── CARD 2: Color Variance — Subtle Swatch Comparison ── */}
           <div style={{ background: '#ffffff', borderRadius: '14px', padding: '20px 24px', border: '1px solid #e4e4e7' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
               <div style={{ flexShrink: 0, flex: 1 }}>
-                <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '0 0 6px', color: '#09090b' }}>🎨 রঙের তারতম্য স্বাভাবিক</h3>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '0 0 6px', color: '#09090b' }}>🎨 রঙ একটু আলাদা দেখাতে পারে</h3>
                 <p style={{ fontSize: '12.5px', color: '#52525b', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
-                  ক্যামেরার লাইটিং ও স্ক্রিনের ব্রাইটনেসের কারণে পণ্যের আসল রঙ একটু লাইট বা ডিপ দেখাতে পারে। এটি সম্পূর্ণ স্বাভাবিক।
+                  মোবাইলের স্ক্রিনে যে রঙ দেখেছেন, হাতে পেলে সেটা একটু হালকা বা গাঢ় মনে হতে পারে। ঘরের আলো, রোদ বা ক্যামেরার কারণে এটা হয় — পণ্যের কোনো সমস্যা নেই।
                 </p>
               </div>
               
-              {/* ── VISUAL HACK: Side-by-side swatch comparison ── */}
+              {/* ── VISUAL: Subtle shade comparison — close but not dramatic ── */}
               <div style={{ flexShrink: 0 }}>
                 <p style={{ fontSize: '9px', fontWeight: 800, color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center', margin: '0 0 8px' }}>উদাহরণ</p>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  {/* Screen view swatch */}
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '8px', background: 'linear-gradient(145deg, #f59e0b, #fbbf24)', border: '2px solid #e4e4e7', boxShadow: '0 0 0 3px rgba(251,191,36,0.2)' }}></div>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '8px', background: '#8b5e3c', border: '2px solid #e4e4e7' }}></div>
                     <p style={{ fontSize: '8px', fontWeight: 700, color: '#71717a', margin: '4px 0 0', lineHeight: 1.2 }}>📱 স্ক্রিনে</p>
                   </div>
-                  {/* Arrow */}
                   <div style={{ fontSize: '14px', color: '#d4d4d8', marginBottom: '16px' }}>→</div>
-                  {/* Real life swatch */}
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '8px', background: 'linear-gradient(145deg, #b45309, #d97706)', border: '2px solid #e4e4e7' }}></div>
+                    <div style={{ width: '42px', height: '42px', borderRadius: '8px', background: '#7a5230', border: '2px solid #e4e4e7' }}></div>
                     <p style={{ fontSize: '8px', fontWeight: 700, color: '#71717a', margin: '4px 0 0', lineHeight: 1.2 }}>☀️ বাস্তবে</p>
                   </div>
                 </div>
@@ -199,53 +196,70 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
             </div>
           </div>
 
-          {/* ── CARD 3: Exchange — Step Timeline Style ── */}
-          <div style={{ background: '#fafafa', borderRadius: '14px', padding: '20px 24px', border: '1px solid #e4e4e7' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '0 0 16px', color: '#09090b' }}>🔁 এক্সচেঞ্জ করতে চাইলে যা করবেন</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+          {/* ── CARD 3: Exchange — Step Timeline with Details ── */}
+          <div style={{ background: '#fafafa', borderRadius: '14px', padding: '22px 24px', border: '1px solid #e4e4e7' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 900, margin: '0 0 20px', color: '#09090b' }}>🔁 এক্সচেঞ্জ করতে চাইলে যা করবেন</h3>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0' }}>
               {/* Step 1 */}
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontSize: '18px' }}>📦</div>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#1e40af', margin: 0, lineHeight: 1.3 }}>পার্সেল পান</p>
+              <div style={{ textAlign: 'center', flex: 1, padding: '0 4px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: '20px' }}>📦</div>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#1e40af', margin: '0 0 4px' }}>পার্সেল পান</p>
+                <p style={{ fontSize: '10.5px', color: '#3b82f6', margin: 0, lineHeight: 1.4, fontWeight: 500 }}>ডেলিভারি পাওয়ার সাথে সাথে ভিডিও রেকর্ড করুন</p>
               </div>
-              <div style={{ width: '30px', height: '2px', background: '#e4e4e7', flexShrink: 0 }}></div>
+              <div style={{ width: '20px', height: '2px', background: '#e4e4e7', flexShrink: 0, marginTop: '22px' }}></div>
               {/* Step 2 */}
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontSize: '18px' }}>🤔</div>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#854d0e', margin: 0, lineHeight: 1.3 }}>সমস্যা থাকলে</p>
+              <div style={{ textAlign: 'center', flex: 1, padding: '0 4px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: '20px' }}>🔍</div>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#854d0e', margin: '0 0 4px' }}>পণ্য চেক করুন</p>
+                <p style={{ fontSize: '10.5px', color: '#92400e', margin: 0, lineHeight: 1.4, fontWeight: 500 }}>সাইজ, কালার বা পণ্য মিলছে কিনা দেখুন</p>
               </div>
-              <div style={{ width: '30px', height: '2px', background: '#e4e4e7', flexShrink: 0 }}></div>
+              <div style={{ width: '20px', height: '2px', background: '#e4e4e7', flexShrink: 0, marginTop: '22px' }}></div>
               {/* Step 3 */}
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#fce7f3', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontSize: '18px' }}>🛵</div>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#9d174d', margin: 0, lineHeight: 1.3 }}>ডেলিভারিম্যানকে ফেরৎ দিন</p>
+              <div style={{ textAlign: 'center', flex: 1, padding: '0 4px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#fce7f3', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: '20px' }}>🛵</div>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#9d174d', margin: '0 0 4px' }}>ম্যানকে ফেরৎ দিন</p>
+                <p style={{ fontSize: '10.5px', color: '#be185d', margin: 0, lineHeight: 1.4, fontWeight: 500 }}>ডেলিভারি চার্জ দিয়ে ডেলিভারিম্যানের কাছেই ফেরৎ দিন</p>
               </div>
-              <div style={{ width: '30px', height: '2px', background: '#e4e4e7', flexShrink: 0 }}></div>
+              <div style={{ width: '20px', height: '2px', background: '#e4e4e7', flexShrink: 0, marginTop: '22px' }}></div>
               {/* Step 4 */}
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px', fontSize: '18px' }}>✅</div>
-                <p style={{ fontSize: '11px', fontWeight: 700, color: '#14532d', margin: 0, lineHeight: 1.3 }}>৩ দিনের মধ্যে জানান</p>
+              <div style={{ textAlign: 'center', flex: 1, padding: '0 4px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px', fontSize: '20px' }}>✅</div>
+                <p style={{ fontSize: '12px', fontWeight: 800, color: '#14532d', margin: '0 0 4px' }}>আমাদের জানান</p>
+                <p style={{ fontSize: '10.5px', color: '#166534', margin: 0, lineHeight: 1.4, fontWeight: 500 }}>ডেলিভারির ৩ দিনের মধ্যে আমাদের সাথে যোগাযোগ করুন</p>
               </div>
             </div>
           </div>
 
-          {/* ── CARD 4: No Exchange — Strikethrough Visual Style ── */}
-          <div style={{ background: '#fff7f7', borderRadius: '14px', padding: '18px 24px', border: '1px solid #fecaca', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '26px', lineHeight: 1, flexShrink: 0, marginTop: '2px' }}>🚫</span>
-            <div>
-              <h3 style={{ fontSize: '14.5px', fontWeight: 900, margin: '0 0 10px', color: '#7f1d1d' }}>যেসব পণ্যে এক্সচেঞ্জ হবে না</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                {[
-                  'কাস্টমাইজড বা স্পেশাল সাইজের পণ্য',
-                  'ডিসকাউন্ট বা অফার মূল্যে কেনা পণ্য',
-                  'একবার ব্যবহার করা হয়েছে এমন পণ্য',
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '10px', color: '#ef4444', fontWeight: 900 }}>✕</span>
-                    <span style={{ fontSize: '12.5px', color: '#991b1b', fontWeight: 500, textDecoration: 'line-through', textDecorationColor: '#fca5a5', textDecorationThickness: '1.5px' }}>{item}</span>
-                  </div>
-                ))}
+          {/* ── CARD 4: No Exchange — Creative Warning Cards ── */}
+          <div style={{ background: 'linear-gradient(135deg, #fff1f2 0%, #fff7f7 100%)', borderRadius: '14px', padding: '20px 24px', border: '1px solid #fecaca' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: '18px' }}>🚫</span>
               </div>
+              <div>
+                <h3 style={{ fontSize: '15px', fontWeight: 900, margin: 0, color: '#7f1d1d' }}>এই পণ্যগুলোতে এক্সচেঞ্জ সম্ভব নয়</h3>
+                <p style={{ fontSize: '11px', color: '#991b1b', margin: 0, fontWeight: 500 }}>অর্ডার দেওয়ার আগেই নিশ্চিত হয়ে নিন</p>
+              </div>
+            </div>
+            {/* Creative badge-style cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { icon: '📐', title: 'কাস্টম সাইজ', detail: 'আপনার মাপ অনুযায়ী তৈরি করা হয়েছে, তাই এটি অন্য কাউকে দেওয়া সম্ভব নয়।' },
+                { icon: '🏷️', title: 'ডিসকাউন্ট / অফার পণ্য', detail: 'বিশেষ ছাড়ে বিক্রি হওয়া পণ্যে রিটার্ন পলিসি প্রযোজ্য নয়।' },
+                { icon: '👕', title: 'ব্যবহার করা পণ্য', detail: 'একবার পরা বা ব্যবহার করা পণ্য স্বাস্থ্যবিধির কারণে ফেরৎ নেওয়া হয় না।' },
+              ].map((it, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', borderRadius: '10px', padding: '12px 14px', border: '1px solid #fecaca' }}>
+                  <div style={{ width: '36px', height: '36px', background: '#fee2e2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '18px' }}>{it.icon}</div>
+                  <div>
+                    <p style={{ fontSize: '13px', fontWeight: 800, color: '#7f1d1d', margin: '0 0 2px' }}>{it.title}</p>
+                    <p style={{ fontSize: '11.5px', color: '#991b1b', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>{it.detail}</p>
+                  </div>
+                  <div style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                    <span style={{ fontSize: '9px', fontWeight: 900, color: '#ef4444', background: '#fee2e2', padding: '3px 8px', borderRadius: '20px', border: '1px solid #fca5a5', textTransform: 'uppercase', letterSpacing: '0.05em' }}>প্রযোজ্য নয়</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
