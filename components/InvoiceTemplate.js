@@ -33,7 +33,7 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
       style={{
         width: '800px',
         background: '#ffffff',
-        color: '#1c1917',
+        color: '#09090b',
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
         padding: '50px 60px',
         boxSizing: 'border-box',
@@ -57,23 +57,23 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
             }}
           />
         ) : (
-          <p style={{ fontSize: '26px', fontWeight: 900, letterSpacing: '0.35em', textTransform: 'uppercase', margin: '0 0 10px', color: '#1c1917' }}>
+          <p style={{ fontSize: '26px', fontWeight: 900, letterSpacing: '0.35em', textTransform: 'uppercase', margin: '0 0 10px', color: '#09090b' }}>
             {settings?.brandName || 'ANZAAR'}
           </p>
         )}
-        <p style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#78716c', margin: 0, fontWeight: 700 }}>
+        <p style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#71717a', margin: 0, fontWeight: 700 }}>
           Official Invoice
         </p>
       </div>
 
       {/* ── ALIGNED CLIENT + INVOICE META ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', paddingBottom: '20px', borderBottom: '2px solid #e7e5e4' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', paddingBottom: '20px', borderBottom: '2px solid #e4e4e7' }}>
         {/* Left column */}
         <div>
           <span style={labelLeft}>Billed To</span>
-          <p style={{ fontSize: '24px', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2, color: '#1c1917' }}>{customer.name}</p>
-          <p style={{ fontSize: '16px', fontWeight: 700, color: '#44403c', margin: '0 0 8px' }}>{customer.phone}</p>
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#57534e', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: '24px', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2, color: '#09090b' }}>{customer.name}</p>
+          <p style={{ fontSize: '16px', fontWeight: 700, color: '#27272a', margin: '0 0 8px' }}>{customer.phone}</p>
+          <p style={{ fontSize: '12px', fontWeight: 600, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1.6, margin: 0 }}>
             {customer.address}
           </p>
         </div>
@@ -81,18 +81,18 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         {/* Right column */}
         <div style={{ textAlign: 'right' }}>
           <span style={labelRight}>Invoice No.</span>
-          <p style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 16px', color: '#1c1917' }}>#{order.orderId}</p>
+          <p style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 16px', color: '#09090b' }}>#{order.orderId}</p>
 
           <span style={labelRight}>Date</span>
-          <p style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#44403c' }}>{date}</p>
+          <p style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#27272a' }}>{date}</p>
         </div>
       </div>
 
       {/* ── ORDER CONFIRMED STATUS ── */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px', marginBottom: '24px' }}>
         <div style={{
-          display: 'inline-flex', alignItems: 'center', background: '#1c1917', color: '#ffffff',
-          padding: '6px 16px', borderRadius: '2px', // Sharper corners for a classier look
+          display: 'inline-flex', alignItems: 'center', background: '#09090b', color: '#ffffff',
+          padding: '6px 16px', borderRadius: '40px',
         }}>
           <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>✓ Order Confirmed</span>
         </div>
@@ -102,26 +102,26 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
         <thead>
           <tr>
-            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a8a29e', textTransform: 'uppercase', textAlign: 'left', paddingBottom: '8px', borderBottom: '1px solid #e7e5e4' }}>Item Details</th>
-            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a8a29e', textTransform: 'uppercase', textAlign: 'center', paddingBottom: '8px', borderBottom: '1px solid #e7e5e4', width: '60px' }}>Qty</th>
-            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a8a29e', textTransform: 'uppercase', textAlign: 'right', paddingBottom: '8px', borderBottom: '1px solid #e7e5e4', width: '100px' }}>Amount</th>
+            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a1a1aa', textTransform: 'uppercase', textAlign: 'left', paddingBottom: '8px', borderBottom: '1px solid #e4e4e7' }}>Item Details</th>
+            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a1a1aa', textTransform: 'uppercase', textAlign: 'center', paddingBottom: '8px', borderBottom: '1px solid #e4e4e7', width: '60px' }}>Qty</th>
+            <th style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', color: '#a1a1aa', textTransform: 'uppercase', textAlign: 'right', paddingBottom: '8px', borderBottom: '1px solid #e4e4e7', width: '100px' }}>Amount</th>
           </tr>
         </thead>
         <tbody>
           {items.map((item, idx) => (
             <tr key={idx}>
-              <td style={{ padding: '16px 0', verticalAlign: 'middle', borderBottom: '1px solid #f5f5f4' }}>
-                <p style={{ fontSize: '16px', fontWeight: 800, color: '#1c1917', margin: '0 0 6px' }}>{item.name}</p>
+              <td style={{ padding: '16px 0', verticalAlign: 'middle', borderBottom: '1px solid #f4f4f5' }}>
+                <p style={{ fontSize: '16px', fontWeight: 800, color: '#09090b', margin: '0 0 6px' }}>{item.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#57534e', textTransform: 'uppercase', background: '#f5f5f4', padding: '2px 6px', borderRadius: '2px' }}>Color: {item.color}</span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#57534e', textTransform: 'uppercase', background: '#f5f5f4', padding: '2px 6px', borderRadius: '2px' }}>Size: {item.size}</span>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#57534e', textTransform: 'uppercase', background: '#f5f5f4', padding: '2px 6px', borderRadius: '2px' }}>SKU: {item.sku}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>Color: {item.color}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>Size: {item.size}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>SKU: {item.sku}</span>
                 </div>
               </td>
-              <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '16px', fontWeight: 900, color: '#1c1917', borderBottom: '1px solid #f5f5f4' }}>
+              <td style={{ padding: '16px 0', textAlign: 'center', fontSize: '16px', fontWeight: 900, color: '#09090b', borderBottom: '1px solid #f4f4f5' }}>
                 {item.quantity}
               </td>
-              <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '18px', fontWeight: 900, color: '#1c1917', borderBottom: '1px solid #f5f5f4' }}>
+              <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '18px', fontWeight: 900, color: '#09090b', borderBottom: '1px solid #f4f4f5' }}>
                 ৳{item.price.toLocaleString()}
               </td>
             </tr>
@@ -133,172 +133,168 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginTop: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#78716c' }}>Subtotal</span>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#44403c' }}>৳{totals.subtotal.toLocaleString()}</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#71717a' }}>Subtotal</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#3f3f46' }}>৳{totals.subtotal.toLocaleString()}</span>
           </div>
           {totals.discount > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#78716c' }}>Discount</span>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#44403c' }}>–৳{totals.discount.toLocaleString()}</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#71717a' }}>Discount</span>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#3f3f46' }}>–৳{totals.discount.toLocaleString()}</span>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#78716c' }}>Delivery</span>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#44403c' }}>৳{totals.delivery.toLocaleString()}</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#71717a' }}>Delivery</span>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#3f3f46' }}>৳{totals.delivery.toLocaleString()}</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', paddingTop: '8px', borderTop: '1px solid #e7e5e4' }}>
-            <span style={{ fontSize: '13px', fontWeight: 900, color: '#1c1917', textTransform: 'uppercase' }}>Grand Total</span>
-            <span style={{ fontSize: '18px', fontWeight: 900, color: '#1c1917' }}>৳{totals.total.toLocaleString()}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', paddingTop: '8px', borderTop: '1px solid #e4e4e7' }}>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#09090b', textTransform: 'uppercase' }}>Grand Total</span>
+            <span style={{ fontSize: '18px', fontWeight: 900, color: '#09090b' }}>৳{totals.total.toLocaleString()}</span>
           </div>
         </div>
 
-        <div style={{ textAlign: 'right', background: '#fafaf9', padding: '16px', borderRadius: '4px', border: '1px solid #e7e5e4' }}>
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#57534e', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
+        <div style={{ textAlign: 'right', background: '#fafafa', padding: '16px', borderRadius: '12px', border: '1px solid #e4e4e7' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
             ডেলিভারিতে প্রদেয় (Due)
           </span>
-          <p style={{ fontSize: '48px', fontWeight: 900, margin: 0, color: '#1c1917', lineHeight: 1 }}>
+          <p style={{ fontSize: '48px', fontWeight: 900, margin: 0, color: '#09090b', lineHeight: 1 }}>
             ৳{totals.due.toLocaleString()}
           </p>
           {totals.paid > 0 && (
-            <p style={{ fontSize: '12px', fontWeight: 700, color: '#57534e', margin: '8px 0 0' }}>
+            <p style={{ fontSize: '12px', fontWeight: 700, color: '#16a34a', margin: '8px 0 0' }}>
               আগাম পরিশোধিত: ৳{totals.paid.toLocaleString()}
             </p>
           )}
         </div>
       </div>
 
-      {/* ── CELEBRATION BANNER (PREMIUM UNDERSTATED) ── */}
+      {/* ── CELEBRATION BANNER ── */}
       <div style={{
-        marginTop: '32px', padding: '24px', textAlign: 'center',
-        borderTop: '1px solid #e7e5e4', borderBottom: '1px solid #e7e5e4'
+        marginTop: '24px', padding: '20px', borderRadius: '12px', textAlign: 'center',
+        background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+        border: '1px solid #bbf7d0', boxShadow: '0 4px 12px rgba(22, 163, 74, 0.05)'
       }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1c1917', margin: '0 0 8px', letterSpacing: '0.02em' }}>
-          আপনার অর্ডারটি সফলভাবে কনফার্ম হয়েছে।
+        <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#14532d', margin: '0 0 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '24px' }}>🎉</span> আপনার অর্ডারটি সফলভাবে কনফার্ম হয়েছে!
         </h3>
-        <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#57534e', margin: 0, lineHeight: 1.6 }}>
-          আঞ্জার-এর এক্সক্লুসিভ কালেকশন বেছে নেওয়ার জন্য আপনাকে আন্তরিক ধন্যবাদ। আপনার পার্সেলটি অত্যন্ত যত্ন সহকারে প্রস্তুত করে দ্রুততম সময়ে আপনার কাছে পৌঁছে দেওয়া হবে।
+        <p style={{ fontSize: '14px', fontWeight: 600, color: '#166534', margin: 0 }}>
+          আঞ্জার বেছে নেওয়ার জন্য আপনাকে আন্তরিক ধন্যবাদ। আপনার পার্সেলটি দ্রুততম সময়ে আপনার কাছে পৌঁছে দিতে আমরা কাজ করছি।
         </p>
       </div>
 
-      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (PREMIUM EDITORIAL THEME) ── */}
-      <div style={{ marginTop: '50px' }}>
+      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (MODERN SMOOTH DARK THEME) ── */}
+      <div style={{ marginTop: '40px' }}>
         <div style={{
-          background: '#faf9f6', // Elegant cream/off-white background
-          padding: '40px',
-          border: '1px solid #e6e4df',
+          background: 'linear-gradient(160deg, #09090b 0%, #1a1a1f 100%)', 
+          borderRadius: '16px', padding: '24px 32px', color: '#ffffff',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+          border: '1px solid #27272a'
         }}>
-          {/* Section Header */}
-          <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#a39b8e', display: 'block', marginBottom: '8px' }}>
-              Essential Guidelines
-            </span>
-            <h2 style={{ fontSize: '18px', fontWeight: 900, margin: '0 0 16px', color: '#1c1917', letterSpacing: '-0.02em' }}>
-              আপনার শপিং অভিজ্ঞতা সুন্দর করতে কিছু জরুরি নিয়ম
-            </h2>
-            <div style={{ width: '40px', height: '2px', background: '#d6d3d1', margin: '0 auto' }}></div>
+          <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '32px' }}>👀</span>
+            <div>
+              <h2 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 4px', 
+                background: 'linear-gradient(90deg, #ffffff, #a1a1aa)', 
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+              }}>
+                একটু সময় দিন!
+              </h2>
+              <p style={{ fontSize: '13px', color: '#a1a1aa', margin: 0, fontWeight: 500 }}>
+                শপিং শেষে অনেকেই এই অংশটি এড়িয়ে যান, কিন্তু আনুষঙ্গিক সুরক্ষার জন্য এই তথ্যগুলো জানা খুবই জরুরি।
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* 1. Unpacking Video Hero Card */}
+            {/* 1. Unpacking Video Hero Card - Smooth Neon Green Glass */}
             <div style={{
-              background: '#ffffff',
-              border: '1px solid #e6e4df',
-              padding: '24px 32px', display: 'flex', gap: '24px', alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(21, 128, 61, 0.05) 100%)',
+              border: '1px solid rgba(34, 197, 94, 0.25)',
+              borderRadius: '12px', padding: '20px', display: 'flex', gap: '16px', alignItems: 'center',
+              boxShadow: 'inset 0 0 20px rgba(34, 197, 94, 0.05)'
             }}>
-              <div style={{ 
-                width: '56px', height: '56px', borderRadius: '50%', background: '#f5f5f4', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#57534e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                  <line x1="7" y1="2" x2="7" y2="22"></line>
-                  <line x1="17" y1="2" x2="17" y2="22"></line>
-                  <line x1="2" y1="12" x2="22" y2="12"></line>
-                  <line x1="2" y1="7" x2="7" y2="7"></line>
-                  <line x1="2" y1="17" x2="7" y2="17"></line>
-                  <line x1="17" y1="17" x2="22" y2="17"></line>
-                  <line x1="17" y1="7" x2="22" y2="7"></line>
-                </svg>
-              </div>
+              <span style={{ fontSize: '42px', lineHeight: 1, filter: 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.4))' }}>📦🎥</span>
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '0 0 6px', color: '#1c1917', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  প্রাইমারি রিকয়ারমেন্ট: আনপ্যাকিং ভিডিও
+                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 6px', color: '#4ade80' }}>
+                  যেটি সবচেয়ে বেশি জরুরি: আনপ্যাকিং ভিডিও
                 </h3>
-                <p style={{ fontSize: '13.5px', color: '#57534e', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
-                  পার্সেলটি খোলার সময় অবশ্যই ভিডিও রেকর্ড করুন। এটি আপনার এবং আমাদের—উভয়ের জন্যই সবচেয়ে বড় প্রমাণ ও সুরক্ষা। স্বচ্ছতার স্বার্থে, আনপ্যাকিং ভিডিও ছাড়া কোনো ক্লেইম গ্রহণযোগ্য হবে না।
+                <p style={{ fontSize: '13.5px', color: '#d1fae5', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>
+                  পার্সেলটি খোলার আগে অবশ্যই মোবাইলে ভিডিও চালু করুন। এটি আপনার সুরক্ষা! আনপ্যাকিং ভিডিও ছাড়া আমরা কোনো ত্রুটি বা ক্লেইম প্রমাণ করতে পারবো না।
                 </p>
               </div>
             </div>
 
             {/* 2 Grid Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               
-              {/* Color Variance Creative Box */}
-              <div style={{ background: '#ffffff', padding: '24px', border: '1px solid #e6e4df', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 8px', color: '#1c1917' }}>রঙের তারতম্য (Color Variance)</h3>
-                <p style={{ fontSize: '12.5px', color: '#57534e', margin: '0 0 16px', lineHeight: 1.6, fontWeight: 500, flexGrow: 1 }}>
-                  স্ক্রিনের ব্রাইটনেস এবং পারিপার্শ্বিক আলোর কারণে বাস্তবে কাপড়ের রং কিছুটা লাইট বা ডিপ দেখাতে পারে, যা স্বাভাবিক নিয়ম।
+              {/* Color Variance Creative Box - Smooth Dark Glass */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)', 
+                borderRadius: '12px', padding: '16px', 
+                border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column' 
+              }}>
+                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎨</span>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 6px', color: '#e4e4e7' }}>রঙের তারতম্য</h3>
+                <p style={{ fontSize: '12.5px', color: '#a1a1aa', margin: '0 0 12px', lineHeight: 1.5, fontWeight: 500, flexGrow: 1 }}>
+                  ক্যামেরা ও লাইটিং এর কারণে বাস্তবে রঙের উজ্জ্বলতা একটু ভিন্ন দেখাতে পারে, যা স্বাভাবিক নিয়ম।
                 </p>
                 {/* Advanced visual representation of color variance */}
                 <div style={{
-                  height: '28px',
-                  borderRadius: '4px',
-                  background: 'linear-gradient(90deg, #d4cfc5 0%, #b8af9f 50%, #958a74 100%)', // Elegant taupe color shifting gradient
+                  height: '24px',
+                  borderRadius: '6px',
+                  background: 'linear-gradient(90deg, #3f2b1c 0%, #b8865c 50%, #e0c8b6 100%)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  padding: '0 12px',
-                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+                  padding: '0 8px',
+                  boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.5)'
                 }}>
-                   <span style={{ fontSize: '10px', fontWeight: 600, color: '#ffffff', letterSpacing: '0.05em', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>Shadow</span>
-                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{opacity: 0.8}}>
-                     <circle cx="12" cy="12" r="5"></circle>
-                     <line x1="12" y1="1" x2="12" y2="3"></line>
-                     <line x1="12" y1="21" x2="12" y2="23"></line>
-                     <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                     <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                     <line x1="1" y1="12" x2="3" y2="12"></line>
-                     <line x1="21" y1="12" x2="23" y2="12"></line>
-                     <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                   </svg>
-                   <span style={{ fontSize: '10px', fontWeight: 600, color: '#44403c', letterSpacing: '0.05em' }}>Bright Light</span>
+                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', opacity: 0.8 }}>Low Light</span>
+                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#44403c', letterSpacing: '0.05em' }}>Bright Light</span>
                 </div>
               </div>
 
-              {/* Exchange Policy */}
-              <div style={{ background: '#ffffff', padding: '24px', border: '1px solid #e6e4df' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1c1917" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                  </svg>
-                  <h3 style={{ fontSize: '14px', fontWeight: 800, margin: 0, color: '#1c1917' }}>এক্সচেঞ্জ সুবিধা</h3>
-                </div>
-                <p style={{ fontSize: '12.5px', color: '#57534e', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
-                  ফিটিংস বা অন্য কোনো ইস্যুতে এক্সচেঞ্জ করতে চাইলে, ডেলিভারি ম্যান থাকাকালীন ডেলিভারি চার্জ দিয়ে রিটার্ন দিন। পরবর্তীতে এক্সচেঞ্জ করতে <strong>৩ দিনের মধ্যে</strong> আমাদের অবহিত করুন।
+              {/* Exchange Policy - Smooth Dark Glass */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)', 
+                borderRadius: '12px', padding: '16px', 
+                border: '1px solid rgba(255, 255, 255, 0.05)' 
+              }}>
+                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🔁</span>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 6px', color: '#e4e4e7' }}>এক্সচেঞ্জ সুবিধা</h3>
+                <p style={{ fontSize: '12.5px', color: '#a1a1aa', margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
+                  ফিটিংস বা অন্য কোনো ইস্যুতে এক্সচেঞ্জ করতে চাইলে, ডেলিভারি ম্যান থাকাকালীন চার্জ দিয়ে ফেরৎ দিন অথবা ৩ দিনের মধ্যে আমাদের জানান।
                 </p>
               </div>
             </div>
 
-            {/* 3. Exceptions */}
+            {/* 3. Negative Case Warning - Smooth Red Glow */}
             <div style={{
-              background: '#ffffff', padding: '16px 24px', display: 'flex', gap: '16px', alignItems: 'center',
-              border: '1px solid #e6e4df', borderLeft: '3px solid #1c1917'
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(153, 27, 27, 0.05) 100%)', 
+              borderRadius: '12px', padding: '16px 20px', display: 'flex', gap: '16px', alignItems: 'center',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              boxShadow: 'inset 0 0 20px rgba(239, 68, 68, 0.05)'
             }}>
+              <span style={{ fontSize: '28px', lineHeight: 1, filter: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))' }}>🚫</span>
               <div>
-                <h3 style={{ fontSize: '13.5px', fontWeight: 800, margin: '0 0 4px', color: '#1c1917' }}>
-                  যেসব ক্ষেত্রে এক্সচেঞ্জ প্রযোজ্য নয়
+                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 4px', color: '#fca5a5' }}>
+                  যেসব ক্ষেত্রে এক্সচেঞ্জ হবে না
                 </h3>
-                <p style={{ fontSize: '12.5px', color: '#57534e', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>
-                  কাস্টমাইজড বা স্পেশাল সাইজ, ডিসকাউন্ট পণ্য বা ব্যবহার করা পণ্যের ক্ষেত্রে কোনো প্রকার রিটার্ন, রিফান্ড বা এক্সচেঞ্জ পলিসি প্রযোজ্য নয়।
+                <p style={{ fontSize: '12.5px', color: '#fecaca', margin: 0, fontWeight: 500, lineHeight: 1.5, opacity: 0.9 }}>
+                  কাস্টমাইজড সাইজ, ডিসকাউন্ট পণ্য বা ব্যবহার করা পণ্যের ক্ষেত্রে কোনো প্রকার রিটার্ন, রিফান্ড বা এক্সচেঞ্জ প্রযোজ্য হবে না।
                 </p>
               </div>
             </div>
 
           </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ marginTop: '30px', textAlign: 'center' }}>
+        <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#a1a1aa', margin: 0 }}>
+          {settings?.brandName || 'Anzaar'} · Electronic Invoice · No Physical Signature Required
+        </p>
       </div>
 
     </div>
