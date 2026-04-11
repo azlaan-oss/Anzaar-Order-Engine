@@ -81,9 +81,8 @@ export default function Sidebar() {
                   <div className="h-6 w-auto flex items-center justify-center overflow-visible">
                      <img 
                         src={settings.logoUrl} 
-                        className="h-full w-auto object-contain brightness-150 origin-left" 
+                        className="h-full w-auto object-contain brightness-0 origin-left" 
                         style={{ 
-                          mixBlendMode: 'screen',
                           transform: `scale(${settings.logoScale ? settings.logoScale * 0.7 : 1.1})` 
                         }} 
                         alt="Brand Logo" 
