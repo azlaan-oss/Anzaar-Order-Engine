@@ -7,8 +7,12 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const snap = await getDoc(doc(db, "settings", "global"));
-      if (snap.exists()) setSettings(snap.data());
+      try {
+        const snap = await getDoc(doc(db, "settings", "global"));
+        if (snap.exists()) setSettings(snap.data());
+      } catch (err) {
+        console.error("Logo Sync Error:", err);
+      }
     };
     fetchSettings();
   }, []);
@@ -25,152 +29,168 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
   return (
     <div 
       ref={ref}
-      className="w-[800px] bg-white p-20 text-zinc-950 font-sans relative overflow-hidden"
-      style={{ minHeight: '1131px' }} // A4 Ratio
+      className="w-[800px] bg-white p-14 md:p-16 text-zinc-950 font-sans relative overflow-hidden flex flex-col"
+      style={{ minHeight: '1131px' }} // A4/Standard Ratio
     >
-      {/* Subtle Background Mark */}
-      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-zinc-50 rounded-full blur-[120px] -z-10 opacity-50" />
+      {/* Dynamic Background Element */}
+      <div className="absolute top-[-5%] left-0 right-0 h-40 bg-zinc-50 border-b border-zinc-100 flex items-center justify-center -z-10" />
       
-      {/* Header Section */}
-      <div className="flex flex-col items-center text-center mb-16">
-        {settings?.logoUrl && (
-          <div className="mb-6">
+      {/* Brand Header - FIXED LOGO & DYNAMIC STYLE */}
+      <div className="flex flex-col items-center text-center mt-4 mb-20">
+        {settings?.logoUrl ? (
+          <div className="mb-6 relative">
+            <div className="absolute inset-0 bg-zinc-900/5 blur-3xl rounded-full opacity-50" />
             <img 
               src={settings.logoUrl} 
-              className="h-20 w-auto object-contain transition-all duration-700" 
+              className="h-28 w-auto object-contain relative z-10" 
               alt="Brand Logo" 
+              crossOrigin="anonymous"
             />
           </div>
+        ) : (
+          <h1 className="text-4xl font-black uppercase tracking-[0.4em] text-zinc-950 mb-4">{settings?.brandName || 'ANZAAR'}</h1>
         )}
-        <h1 className="text-3xl font-black uppercase tracking-[0.3em] text-zinc-900 leading-none">
-          {settings?.brandName || 'ANZAAR'}
-        </h1>
-        <div className="h-px w-12 bg-zinc-200 my-4 mx-auto" />
-        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">Official Invoice</p>
-      </div>
-
-      {/* Info Grid */}
-      <div className="grid grid-cols-2 gap-20 mb-16 border-y border-zinc-100 py-12">
-        <div className="space-y-4">
-          <div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-300 mb-2">Billed To</p>
-            <h2 className="text-2xl font-black text-zinc-900 tracking-tight">{customer.name}</h2>
-            <p className="text-sm font-bold text-zinc-500 mt-1">{customer.phone}</p>
-          </div>
-          <div className="pt-2">
-            <p className="text-xs text-zinc-400 leading-relaxed font-medium uppercase tracking-wider">{customer.address}</p>
-          </div>
-        </div>
-
-        <div className="text-right space-y-6">
-          <div className="space-y-1">
-             <p className="text-[9px] font-black uppercase tracking-widest text-zinc-300">Order ID</p>
-             <p className="text-lg font-black text-zinc-900 leading-none">#{order.orderId || 'PENDING'}</p>
-          </div>
-          <div className="space-y-1">
-             <p className="text-[9px] font-black uppercase tracking-widest text-zinc-300">Issue Date</p>
-             <p className="text-sm font-bold text-zinc-900">{date}</p>
-          </div>
-          <div className="inline-block px-4 py-2 bg-zinc-900 rounded-full">
-             <p className="text-[9px] font-black uppercase tracking-widest text-white">Status: {order.status || 'Confirmed'}</p>
-          </div>
+        <div className="space-y-2">
+          <p className="text-[12px] font-black uppercase tracking-[0.6em] text-zinc-400">Official Statement</p>
+          <div className="h-1 w-20 bg-zinc-950 mx-auto rounded-full" />
         </div>
       </div>
 
-      {/* Items Table */}
-      <div className="flex-1">
-        <table className="w-full">
-          <thead>
-            <tr className="text-[9px] font-black uppercase tracking-widest text-zinc-300 text-left border-b border-zinc-100">
-              <th className="pb-4 pl-4">Description</th>
-              <th className="pb-4 text-center">Qty</th>
-              <th className="pb-4 text-right">Price</th>
-              <th className="pb-4 text-right pr-4">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-50">
-            {items.map((item, idx) => (
-              <tr key={idx} className="group">
-                <td className="py-8 pl-4">
-                  <p className="text-sm font-black text-zinc-900 uppercase tracking-tight">{item.name}</p>
-                  <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full border border-zinc-200" />
-                    {item.color} • {item.size} • SKU: {item.sku}
-                  </p>
-                </td>
-                <td className="py-8 text-center text-sm font-black text-zinc-900">{item.quantity}</td>
-                <td className="py-8 text-right text-sm font-bold text-zinc-500">৳{item.price.toLocaleString()}</td>
-                <td className="py-8 text-right text-sm font-black text-zinc-900 pr-4">৳{(item.price * item.quantity).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="mt-20 flex justify-between items-end">
-        {/* Verification / Branding */}
-        <div className="space-y-4 max-w-[300px]">
-           <p className="text-[9px] font-bold text-zinc-300 leading-relaxed uppercase tracking-widest italic">
-             Thank you for your order. We appreciate your preference for exceptional quality and timeless design.
-           </p>
-           <div className="flex items-center gap-3 grayscale opacity-30">
-              <div className="w-10 h-10 border border-zinc-200 rounded-lg flex items-center justify-center p-1">
-                 {/* Empty box for potential QR code placeholder */}
-                 <div className="w-full h-full bg-zinc-100 rounded-sm" />
+      {/* Main Container */}
+      <div className="px-6 flex-1 flex flex-col justify-between">
+        <div className="space-y-16">
+          {/* Info Blocks - Increased Font for Mobile */}
+          <div className="grid grid-cols-2 gap-10">
+            <div className="space-y-6">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-zinc-300 mb-3 ml-1">Clientele</p>
+                <h2 className="text-3xl font-black text-zinc-950 tracking-tight leading-tight">{customer.name}</h2>
+                <p className="text-lg font-bold text-zinc-600 mt-2">{customer.phone}</p>
               </div>
-              <p className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">
-                Verified Authentic<br/>Anzaar Official
+              <div className="pt-2 border-l-4 border-zinc-950 pl-6">
+                <p className="text-sm text-zinc-400 leading-relaxed font-bold uppercase tracking-widest">{customer.address}</p>
+              </div>
+            </div>
+
+            <div className="text-right flex flex-col justify-between items-end">
+              <div className="space-y-4">
+                 <div className="space-y-1">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-zinc-300">Reference</p>
+                    <p className="text-2xl font-black text-zinc-950">#{order.orderId}</p>
+                 </div>
+                 <div className="space-y-1">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-zinc-300">Timestamp</p>
+                    <p className="text-sm font-black text-zinc-900 uppercase tracking-widest">{date}</p>
+                 </div>
+              </div>
+              <div className="px-8 py-3 bg-zinc-950 rounded-2xl shadow-xl shadow-zinc-950/20">
+                 <p className="text-[10px] font-black uppercase tracking-widest text-white">Status: {order.status}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Itemized Table - High Clarity */}
+          <div className="pt-4">
+            <table className="w-full">
+              <thead>
+                <tr className="text-[11px] font-black uppercase tracking-widest text-zinc-300 text-left border-b-2 border-zinc-50 pb-6">
+                  <th className="pb-6 pl-4">Manifest</th>
+                  <th className="pb-6 text-center">Unit</th>
+                  <th className="pb-6 text-right pr-4 text-zinc-950">Valuation</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-50">
+                {items.map((item, idx) => (
+                  <tr key={idx}>
+                    <td className="py-10 pl-4 max-w-[400px]">
+                      <p className="text-xl font-black text-zinc-950 uppercase tracking-tight mb-2">{item.name}</p>
+                      <div className="flex items-center gap-3">
+                         <span className="w-3 h-3 rounded-full border-2 border-zinc-900 bg-zinc-950" />
+                         <p className="text-[11px] text-zinc-400 font-black uppercase tracking-widest">
+                           {item.color} • {item.size} • SKU: {item.sku}
+                         </p>
+                      </div>
+                    </td>
+                    <td className="py-10 text-center text-lg font-black text-zinc-950">{item.quantity}</td>
+                    <td className="py-10 text-right pr-4">
+                      <p className="text-xl font-black text-zinc-950">৳{item.price.toLocaleString()}</p>
+                      <p className="text-[10px] text-zinc-300 font-bold uppercase tracking-widest mt-1">Net Subtotal</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Final Statement & Totals */}
+        <div className="mt-20 pt-16 border-t-2 border-zinc-50 flex justify-between items-end pb-12">
+           <div className="max-w-[320px] space-y-6">
+              <p className="text-xs font-bold text-zinc-400 leading-relaxed uppercase tracking-widest">
+                This verification certifies that your order has been successfully logged within our luxury management protocol.
               </p>
+              <div className="flex items-center gap-4 opacity-40">
+                 <div className="w-16 h-16 border-2 border-dashed border-zinc-200 rounded-3xl flex items-center justify-center p-2">
+                    <div className="w-full h-full bg-zinc-50 rounded-xl" />
+                 </div>
+                 <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-950 leading-loose">
+                   Digital Signature<br/>Authorized Protocol
+                 </p>
+              </div>
+           </div>
+
+           <div className="w-80">
+              <div className="bg-zinc-950 p-10 rounded-[3rem] space-y-6 shadow-2xl shadow-zinc-950/30 text-white relative">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-12 translate-x-12 blur-3xl text-white" />
+                
+                <div className="space-y-4">
+                   <div className="flex justify-between items-center opacity-40">
+                      <span className="text-[10px] font-black uppercase tracking-widest">Gross Total</span>
+                      <span className="text-sm font-black italic">৳{totals.subtotal.toLocaleString()}</span>
+                   </div>
+                   
+                   {totals.discount > 0 && (
+                     <div className="flex justify-between items-center text-emerald-400">
+                        <span className="text-[10px] font-black uppercase tracking-widest">Incentive</span>
+                        <span className="text-sm font-black">- ৳{totals.discount.toLocaleString()}</span>
+                     </div>
+                   )}
+
+                   <div className="flex justify-between items-center opacity-40">
+                      <span className="text-[10px] font-black uppercase tracking-widest">Logistics</span>
+                      <span className="text-sm font-black italic">+ ৳{totals.delivery.toLocaleString()}</span>
+                   </div>
+                </div>
+
+                <div className="h-[2px] bg-white/10" />
+
+                <div className="flex flex-col gap-1 p-2">
+                   <span className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Grand Valuation</span>
+                   <span className="text-4xl font-black tracking-tighter">৳{totals.total.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                 <div className="bg-emerald-50 p-6 rounded-[2rem] border border-emerald-100 text-center">
+                    <p className="text-[9px] font-black text-emerald-300 uppercase tracking-widest mb-1 leading-none">Settled</p>
+                    <p className="text-lg font-black text-emerald-600 tracking-tight leading-none">৳{totals.paid.toLocaleString()}</p>
+                 </div>
+                 <div className="bg-rose-50 p-6 rounded-[2rem] border border-rose-100 text-center">
+                    <p className="text-[9px] font-black text-rose-300 uppercase tracking-widest mb-1 leading-none">Remaining</p>
+                    <p className="text-lg font-black text-rose-600 tracking-tight leading-none">৳{totals.due.toLocaleString()}</p>
+                 </div>
+              </div>
            </div>
         </div>
-
-        {/* Totals Breakdown */}
-        <div className="w-80 space-y-4">
-          <div className="bg-zinc-50 p-8 rounded-[2.5rem] space-y-4 shadow-sm border border-zinc-100/50">
-            <div className="flex justify-between items-center px-2">
-               <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Gross Subtotal</span>
-               <span className="text-sm font-black text-zinc-900">৳{totals.subtotal.toLocaleString()}</span>
-            </div>
-            
-            {totals.discount > 0 && (
-              <div className="flex justify-between items-center px-2 text-rose-500 font-black">
-                 <span className="text-[10px] uppercase tracking-widest">Promotion Applied</span>
-                 <span className="text-sm">- ৳{totals.discount.toLocaleString()}</span>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center px-2">
-               <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Logistics Fee</span>
-               <span className="text-sm font-black text-zinc-900">৳{totals.delivery.toLocaleString()}</span>
-            </div>
-
-            <div className="h-px bg-zinc-200/50 mx-2" />
-
-            <div className="flex justify-between items-center px-2 pt-2">
-               <span className="text-[11px] font-black text-zinc-950 uppercase tracking-[0.2em]">Grand Total</span>
-               <span className="text-2xl font-black text-zinc-900 tracking-tighter">৳{totals.total.toLocaleString()}</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-emerald-50/50 p-4 rounded-3xl border border-emerald-100/50 text-center">
-               <p className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mb-1">Cleared</p>
-               <p className="text-sm font-black text-emerald-600 tracking-tight">৳{totals.paid.toLocaleString()}</p>
-            </div>
-            <div className="bg-rose-50/50 p-4 rounded-3xl border border-rose-100/50 text-center">
-               <p className="text-[8px] font-black text-rose-400 uppercase tracking-widest mb-1">Outstanding</p>
-               <p className="text-sm font-black text-rose-600 tracking-tight">৳{totals.due.toLocaleString()}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Micro-Footer */}
-      <div className="absolute bottom-10 left-0 right-0 text-center opacity-30">
-        <p className="text-[7px] font-black uppercase tracking-[1em] text-zinc-400">
-          Electronic Document Protocol • No Signature Required
-        </p>
+      {/* Persistent Footer */}
+      <div className="absolute bottom-10 left-0 right-0 text-center opacity-20 mt-12">
+        <div className="inline-flex items-center gap-4 px-6 py-2 border border-zinc-200 rounded-full">
+           <p className="text-[8px] font-black uppercase tracking-[1em] text-zinc-950 pl-2">
+             Anzaar Luxury Management System
+           </p>
+        </div>
       </div>
     </div>
   );
