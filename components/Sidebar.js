@@ -167,15 +167,15 @@ export default function Sidebar() {
         md:translate-x-0 md:relative md:w-64 md:h-screen md:sticky md:top-0 shadow-2xl
       `}>
         {/* Sidebar Header - Enhanced */}
-        <div className="p-8 pb-4">
+        <div className="p-8 pb-4 flex flex-col items-center">
            {settings?.logoUrl ? (
               <Link href="/" className="inline-block hover:opacity-80 transition-opacity active:scale-95 mb-8">
-                 <div className="h-12 w-auto flex items-center overflow-visible">
+                 <div className="h-8 w-auto flex items-center justify-center overflow-visible">
                     <img 
                        src={settings.logoUrl} 
-                       className="h-full w-auto object-contain brightness-0 origin-left ml-2 transition-transform duration-300" 
+                       className="h-full w-auto object-contain brightness-0 transition-transform duration-300" 
                        style={{ 
-                          transform: `scale(${settings.logoScale || 1.4})` 
+                          transform: `scale(${settings.logoScale ? settings.logoScale * 0.8 : 1.2})` 
                        }} 
                        alt="Brand Logo" 
                     />
