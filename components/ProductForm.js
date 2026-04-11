@@ -148,8 +148,8 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error("[DELETE-PROCESS] Error:", err);
-      window.alert("Critical Vault Error: " + err.message);
-      toast.error("Deletion rejected: " + err.message);
+      window.alert("System Error: " + err.message);
+      toast.error("Failed to delete: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -476,7 +476,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
                        {/* Variant Stock Toggle */}
                        <div className={`p-6 rounded-[2rem] border transition-all flex items-center justify-between ${product.variants[activeVariantIdx]?.isStockOut ? 'bg-red-50 border-red-100' : 'bg-zinc-50 border-black/5'}`}>
                           <div className="space-y-1">
-                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Variation Availability</p>
+                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Availability</p>
                              <p className={`text-sm font-bold ${product.variants[activeVariantIdx]?.isStockOut ? 'text-red-500' : 'text-zinc-600'}`}>
                                 {product.variants[activeVariantIdx]?.isStockOut ? 'Stock Out' : 'Available'}
                              </p>

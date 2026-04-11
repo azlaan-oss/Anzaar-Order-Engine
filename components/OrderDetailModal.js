@@ -70,7 +70,7 @@ export default function OrderDetailModal({ order, onClose }) {
   const handleStatusChange = async (newStatus) => {
     if (newStatus === order.status) return;
     setUpdatingStatus(true);
-    const toastId = toast.loading(`Transitioning order to ${newStatus}...`);
+    const toastId = toast.loading(`Updating status to ${newStatus}...`);
     
     try {
       await updateOrder(order.id, { status: newStatus });
@@ -79,9 +79,9 @@ export default function OrderDetailModal({ order, onClose }) {
         previousStatus: order.status || 'pending',
         newStatus: newStatus 
       });
-      toast.success("Protocol updated successfully", { id: toastId });
+      toast.success("Status updated successfully", { id: toastId });
     } catch (err) {
-      toast.error("Failed to update system protocol", { id: toastId });
+      toast.error("Failed to update status", { id: toastId });
     } finally {
       setUpdatingStatus(false);
     }
@@ -97,7 +97,7 @@ export default function OrderDetailModal({ order, onClose }) {
     }
     
     setIsGenerating(true);
-    const toastId = toast.loading("Generating High-Res Invoice...");
+    const toastId = toast.loading("Preparing Invoice...");
 
     try {
       // 1000ms delay to ensure all assets/images are loaded for the JPG capture
