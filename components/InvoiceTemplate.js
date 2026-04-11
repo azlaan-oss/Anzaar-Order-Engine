@@ -181,24 +181,24 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         </p>
       </div>
 
-      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (MODERN SMOOTH DARK THEME) ── */}
+      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (PREMIUM MIDNIGHT SLATE THEME) ── */}
       <div style={{ marginTop: '40px' }}>
         <div style={{
-          background: 'linear-gradient(160deg, #09090b 0%, #1a1a1f 100%)', 
-          borderRadius: '16px', padding: '24px 32px', color: '#ffffff',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-          border: '1px solid #27272a'
+          background: 'linear-gradient(145deg, #0f172a 0%, #020617 100%)', // Deep Slate / Midnight Blue
+          borderRadius: '16px', padding: '28px 32px', color: '#ffffff',
+          boxShadow: '0 12px 40px rgba(15, 23, 42, 0.15)',
+          border: '1px solid #1e293b'
         }}>
-          <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '32px' }}>👀</span>
+          <div style={{ marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <span style={{ fontSize: '32px' }}>✨</span>
             <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 4px', 
-                background: 'linear-gradient(90deg, #ffffff, #a1a1aa)', 
+              <h2 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 6px', 
+                background: 'linear-gradient(90deg, #f8fafc, #94a3b8)', 
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
               }}>
-                একটু সময় দিন!
+                আপনার শপিং অভিজ্ঞতা সুন্দর করতে কিছু জরুরি নিয়ম
               </h2>
-              <p style={{ fontSize: '13px', color: '#a1a1aa', margin: 0, fontWeight: 500 }}>
+              <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0, fontWeight: 500 }}>
                 শপিং শেষে অনেকেই এই অংশটি এড়িয়ে যান, কিন্তু আনুষঙ্গিক সুরক্ষার জন্য এই তথ্যগুলো জানা খুবই জরুরি।
               </p>
             </div>
@@ -206,19 +206,19 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* 1. Unpacking Video Hero Card - Smooth Neon Green Glass */}
+            {/* 1. Unpacking Video Hero Card - Premium Emerald Glass */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(21, 128, 61, 0.05) 100%)',
-              border: '1px solid rgba(34, 197, 94, 0.25)',
-              borderRadius: '12px', padding: '20px', display: 'flex', gap: '16px', alignItems: 'center',
-              boxShadow: 'inset 0 0 20px rgba(34, 197, 94, 0.05)'
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(4, 120, 87, 0.05) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              borderRadius: '12px', padding: '20px', display: 'flex', gap: '18px', alignItems: 'center',
+              boxShadow: 'inset 0 0 20px rgba(16, 185, 129, 0.05)'
             }}>
-              <span style={{ fontSize: '42px', lineHeight: 1, filter: 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.4))' }}>📦🎥</span>
+              <span style={{ fontSize: '38px', lineHeight: 1, filter: 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.4))' }}>📦🎥</span>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 6px', color: '#4ade80' }}>
+                <h3 style={{ fontSize: '15.5px', fontWeight: 800, margin: '0 0 6px', color: '#10b981' }}>
                   যেটি সবচেয়ে বেশি জরুরি: আনপ্যাকিং ভিডিও
                 </h3>
-                <p style={{ fontSize: '13.5px', color: '#d1fae5', margin: 0, fontWeight: 500, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '13.5px', color: '#d1fae5', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
                   পার্সেলটি খোলার আগে অবশ্যই মোবাইলে ভিডিও চালু করুন। এটি আপনার সুরক্ষা! আনপ্যাকিং ভিডিও ছাড়া আমরা কোনো ত্রুটি বা ক্লেইম প্রমাণ করতে পারবো না।
                 </p>
               </div>
@@ -227,15 +227,15 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
             {/* 2 Grid Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               
-              {/* Color Variance Creative Box - Smooth Dark Glass */}
+              {/* Color Variance Box - Midnight Glass */}
               <div style={{ 
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)', 
-                borderRadius: '12px', padding: '16px', 
-                border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column' 
+                background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.04) 0%, rgba(248, 250, 252, 0.01) 100%)', 
+                borderRadius: '12px', padding: '18px', 
+                border: '1px solid rgba(248, 250, 252, 0.08)', display: 'flex', flexDirection: 'column' 
               }}>
-                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🎨</span>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 6px', color: '#e4e4e7' }}>রঙের তারতম্য</h3>
-                <p style={{ fontSize: '12.5px', color: '#a1a1aa', margin: '0 0 12px', lineHeight: 1.5, fontWeight: 500, flexGrow: 1 }}>
+                <span style={{ fontSize: '24px', display: 'block', marginBottom: '10px' }}>🎨</span>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#f1f5f9' }}>রঙের তারতম্য</h3>
+                <p style={{ fontSize: '12.5px', color: '#94a3b8', margin: '0 0 16px', lineHeight: 1.6, fontWeight: 500, flexGrow: 1 }}>
                   ক্যামেরা ও লাইটিং এর কারণে বাস্তবে রঙের উজ্জ্বলতা একটু ভিন্ন দেখাতে পারে, যা স্বাভাবিক নিয়ম।
                 </p>
                 {/* Advanced visual representation of color variance */}
@@ -247,40 +247,40 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '0 8px',
-                  boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.5)'
+                  boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.2)'
                 }}>
-                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', opacity: 0.8 }}>Low Light</span>
+                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em', opacity: 0.9 }}>Low Light</span>
                    <span style={{ fontSize: '9px', fontWeight: 800, color: '#44403c', letterSpacing: '0.05em' }}>Bright Light</span>
                 </div>
               </div>
 
-              {/* Exchange Policy - Smooth Dark Glass */}
+              {/* Exchange Policy - Midnight Glass */}
               <div style={{ 
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)', 
-                borderRadius: '12px', padding: '16px', 
-                border: '1px solid rgba(255, 255, 255, 0.05)' 
+                background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.04) 0%, rgba(248, 250, 252, 0.01) 100%)', 
+                borderRadius: '12px', padding: '18px', 
+                border: '1px solid rgba(248, 250, 252, 0.08)' 
               }}>
-                <span style={{ fontSize: '24px', display: 'block', marginBottom: '8px' }}>🔁</span>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 6px', color: '#e4e4e7' }}>এক্সচেঞ্জ সুবিধা</h3>
-                <p style={{ fontSize: '12.5px', color: '#a1a1aa', margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
+                <span style={{ fontSize: '24px', display: 'block', marginBottom: '10px' }}>🔁</span>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#f1f5f9' }}>এক্সচেঞ্জ সুবিধা</h3>
+                <p style={{ fontSize: '12.5px', color: '#94a3b8', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
                   ফিটিংস বা অন্য কোনো ইস্যুতে এক্সচেঞ্জ করতে চাইলে, ডেলিভারি ম্যান থাকাকালীন চার্জ দিয়ে ফেরৎ দিন অথবা ৩ দিনের মধ্যে আমাদের জানান।
                 </p>
               </div>
             </div>
 
-            {/* 3. Negative Case Warning - Smooth Red Glow */}
+            {/* 3. Negative Case Warning - Soft Ruby Glow */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(153, 27, 27, 0.05) 100%)', 
-              borderRadius: '12px', padding: '16px 20px', display: 'flex', gap: '16px', alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(153, 27, 27, 0.04) 100%)', 
+              borderRadius: '12px', padding: '18px 20px', display: 'flex', gap: '18px', alignItems: 'center',
               border: '1px solid rgba(239, 68, 68, 0.25)',
               boxShadow: 'inset 0 0 20px rgba(239, 68, 68, 0.05)'
             }}>
-              <span style={{ fontSize: '28px', lineHeight: 1, filter: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))' }}>🚫</span>
+              <span style={{ fontSize: '28px', lineHeight: 1, filter: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.4))' }}>🚫</span>
               <div>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, margin: '0 0 4px', color: '#fca5a5' }}>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 4px', color: '#fca5a5' }}>
                   যেসব ক্ষেত্রে এক্সচেঞ্জ হবে না
                 </h3>
-                <p style={{ fontSize: '12.5px', color: '#fecaca', margin: 0, fontWeight: 500, lineHeight: 1.5, opacity: 0.9 }}>
+                <p style={{ fontSize: '12.5px', color: '#fecaca', margin: 0, fontWeight: 500, lineHeight: 1.6, opacity: 0.9 }}>
                   কাস্টমাইজড সাইজ, ডিসকাউন্ট পণ্য বা ব্যবহার করা পণ্যের ক্ষেত্রে কোনো প্রকার রিটার্ন, রিফান্ড বা এক্সচেঞ্জ প্রযোজ্য হবে না।
                 </p>
               </div>
