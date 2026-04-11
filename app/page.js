@@ -150,12 +150,11 @@ export default function Dashboard() {
             ))}
             <button 
               onClick={() => setIsCustomDate(!isCustomDate)}
-              className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center ${
                 isCustomDate ? 'bg-zinc-950 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-950'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
-              Calendar
+              <Calendar className="w-4 h-4" />
             </button>
           </div>
 
