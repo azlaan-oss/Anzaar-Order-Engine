@@ -1,4 +1,6 @@
 import { google } from 'googleapis';
+import { db } from '../../../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export async function POST(req) {
   try {
@@ -14,12 +16,17 @@ export async function POST(req) {
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
+    
+    // FETCH DYNAMIC SETTINGS FROM FIRESTORE
+    const settingsRef = doc(db, "settings", "global");
+    const settingsSnap = await getDoc(settingsRef);
+    const dbSettings = settingsSnap.exists() ? settingsSnap.data() : {};
+    
     const isTest = order.isTest || order.orderId === 'PING-TEST';
 
-    // 2. Resolve internal Numeric Sheet ID (Required for Merging)
-    // 2. Resolve internal Numeric Sheet ID (Required for Merging)
-    const spreadsheetId = order.sheetId || process.env.NEXT_PUBLIC_ACTIVE_SHEET_ID;
-    const requestedTab = (order.sheetTab || 'Sheet1').trim();
+    // Priority: 1. Request Body, 2. Database Setting, 3. Environment Variable
+    const spreadsheetId = order.sheetId || dbSettings.activeSheetId || process.env.NEXT_PUBLIC_ACTIVE_SHEET_ID;
+    const requestedTab = (order.sheetTab || dbSettings.activeSheetTab || 'Sheet1').trim();
     
     let spreadsheetMaster;
     try {
