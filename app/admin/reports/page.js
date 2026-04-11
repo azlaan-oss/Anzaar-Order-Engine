@@ -34,7 +34,7 @@ export default function ReportsPage() {
   const [timeRange, setTimeRange] = useState('Today');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [isCustomOpen, setIsCustomOpen] = useState(false);
+  const [isCustomDate, setIsCustomDate] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -57,23 +57,27 @@ export default function ReportsPage() {
     let filtered = orders;
     const now = new Date();
 
-    if (timeRange === 'Today') {
+    if (timeRange === 'Custom' && startDate) {
+       const start = new Date(startDate);
+       start.setHours(0, 0, 0, 0);
+       const end = endDate ? new Date(endDate) : new Date(startDate);
+       end.setHours(23, 59, 59, 999);
+       filtered = orders.filter(o => {
+          const d = new Date(o.timestamp);
+          return d >= start && d <= end;
+       });
+    } else if (timeRange === 'Today') {
        const todayStr = now.toDateString();
        filtered = orders.filter(o => new Date(o.timestamp).toDateString() === todayStr);
+    } else if (timeRange === 'Yesterday') {
+       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString();
+       filtered = orders.filter(o => new Date(o.timestamp).toDateString() === yesterday);
     } else if (timeRange === 'Week') {
        const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
        filtered = orders.filter(o => new Date(o.timestamp) >= lastWeek);
     } else if (timeRange === 'Month') {
        const lastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
        filtered = orders.filter(o => new Date(o.timestamp) >= lastMonth);
-    } else if (timeRange === 'Custom' && startDate && endDate) {
-       const start = new Date(startDate);
-       const end = new Date(endDate);
-       end.setHours(23, 59, 59);
-       filtered = orders.filter(o => {
-          const d = new Date(o.timestamp);
-          return d >= start && d <= end;
-       });
     }
 
     const revenue = filtered.reduce((acc, o) => acc + (o.totals?.total || 0), 0);
@@ -139,9 +143,9 @@ export default function ReportsPage() {
   const COLORS = ['#18181b', '#3f3f46', '#71717a', '#a1a1aa', '#d4d4d8'];
   const timeOptions = [
     { id: 'Today', label: 'Today' },
+    { id: 'Yesterday', label: 'Yesterday' },
     { id: 'Week', label: 'Week' },
-    { id: 'Month', label: 'Month' },
-    { id: 'All', label: 'All' }
+    { id: 'Month', label: 'Month' }
   ];
 
   return (
@@ -158,32 +162,30 @@ export default function ReportsPage() {
             </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto z-10 overflow-x-auto no-scrollbar">
-            <div className="flex items-center bg-zinc-50 p-1.5 rounded-2xl md:rounded-[2rem] border border-black/5 w-full sm:w-auto shrink-0 overflow-x-auto no-scrollbar">
+        <div className="flex flex-col md:flex-row items-center justify-center xl:justify-end gap-3 w-full xl:w-auto z-10">
+            <div className="flex items-center bg-zinc-50 p-1.5 rounded-full border border-black/5 shadow-xl w-full md:w-auto overflow-x-auto no-scrollbar justify-center md:justify-start">
                {timeOptions.map(t => (
                   <button 
-                  key={t.id}
-                  onClick={() => { setTimeRange(t.id); setStartDate(''); setEndDate(''); setIsCustomOpen(false); }}
-                  className={`px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all ${timeRange === t.id ? 'bg-zinc-950 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-950'}`}
+                    key={t.id}
+                    onClick={() => { setTimeRange(t.id); setStartDate(''); setEndDate(''); setIsCustomDate(false); }}
+                    className={`px-3 md:px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap ${timeRange === t.id && !isCustomDate ? 'bg-zinc-950 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-950'}`}
                   >
-                  {t.label}
+                    {t.label}
                   </button>
                ))}
                <button 
-                  onClick={() => setIsCustomOpen(!isCustomOpen)}
-                  className={`ml-1 px-6 py-3 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${timeRange === 'Custom' ? 'bg-zinc-950 text-white' : 'text-zinc-400 hover:bg-black/5'}`}
+                  onClick={() => setIsCustomDate(!isCustomDate)}
+                  className={`px-4 py-3 rounded-full text-[9px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center shrink-0 ${isCustomDate ? 'bg-zinc-950 text-white shadow-lg' : 'text-zinc-400 hover:bg-black/5'}`}
                >
                   <Calendar className="w-4 h-4" />
-                  Custom
                </button>
             </div>
-
             <AnimatePresence>
-               {isCustomOpen && (
-                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="flex items-center gap-2 bg-zinc-50 backdrop-blur-xl p-2 py-3 rounded-[2rem] border border-black/5 shadow-inner">
-                     <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setTimeRange('Custom'); }} className="bg-transparent text-[11px] font-black outline-none uppercase text-zinc-950 pl-2 [color-scheme:light]"/>
-                     <span className="text-zinc-300 font-bold">→</span>
-                     <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setTimeRange('Custom'); }} className="bg-transparent text-[11px] font-black outline-none uppercase text-zinc-950 pr-2 [color-scheme:light]"/>
+               {isCustomDate && (
+                  <motion.div initial={{ opacity: 0, scale: 0.95, x: 20 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.95, x: 20 }} className="flex items-center gap-2 bg-zinc-50 p-2 py-3 rounded-full border border-black/5 shadow-xl">
+                     <input type="date" value={startDate} onChange={e => { setStartDate(e.target.value); setTimeRange('Custom'); }} className="bg-transparent text-[11px] font-black outline-none uppercase text-zinc-950 pl-2 [color-scheme:light] w-24"/>
+                     <span className="text-zinc-300 font-bold">/</span>
+                     <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setTimeRange('Custom'); }} className="bg-transparent text-[11px] font-black outline-none uppercase text-zinc-950 pr-2 [color-scheme:light] w-24"/>
                   </motion.div>
                )}
             </AnimatePresence>
