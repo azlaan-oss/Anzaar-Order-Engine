@@ -21,11 +21,11 @@ export default function PerformanceAnalytics({ data, title, height = 200 }) {
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
 
   return (
-    <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[3rem] border border-white shadow-xl shadow-emerald-950/5 space-y-6">
+    <div className="bg-white p-8 rounded-[3rem] border border-black/5 shadow-xl shadow-zinc-950/5 space-y-6">
       <div className="flex items-center justify-between">
-         <h3 className="text-sm font-black text-emerald-950 uppercase tracking-[0.2em]">{title}</h3>
+         <h3 className="text-sm font-black text-zinc-950 uppercase tracking-[0.2em]">{title}</h3>
          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500" />
+            <div className="w-3 h-3 rounded-full bg-zinc-500" />
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Growth Vector</span>
          </div>
       </div>
@@ -40,7 +40,7 @@ export default function PerformanceAnalytics({ data, title, height = 200 }) {
               x2={width - padding} 
               y1={padding + p * (height - 2 * padding)} 
               y2={padding + p * (height - 2 * padding)} 
-              stroke="#F3F4F6" 
+              stroke="#F1F5F9" 
               strokeWidth="1" 
             />
           ))}
@@ -60,7 +60,7 @@ export default function PerformanceAnalytics({ data, title, height = 200 }) {
             transition={{ duration: 1.5, ease: "easeInOut" }}
             d={linePath} 
             fill="none" 
-            stroke="#064e3b" 
+            stroke="#09090b" 
             strokeWidth="4" 
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -76,7 +76,7 @@ export default function PerformanceAnalytics({ data, title, height = 200 }) {
               cx={p.x} 
               cy={p.y} 
               r="6" 
-              fill="#064e3b" 
+              fill="#09090b" 
               stroke="white" 
               strokeWidth="3" 
             />
@@ -84,8 +84,8 @@ export default function PerformanceAnalytics({ data, title, height = 200 }) {
 
           <defs>
             <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#064e3b" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#064e3b" stopOpacity="0" />
+              <stop offset="0%" stopColor="#09090b" stopOpacity="0.1" />
+              <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>

@@ -63,12 +63,12 @@ export default function NewOrderPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/" className="p-2 hover:bg-gray-100 rounded-full transition-all">
-            <ArrowLeft className="w-6 h-6 text-emerald-950" />
+          <Link href="/" className="p-2 hover:bg-zinc-950/20 rounded-full transition-all">
+            <ArrowLeft className="w-6 h-6 text-zinc-950" />
           </Link>
           <div>
-            <h1 className="premium-title text-3xl font-serif">Create New Order</h1>
-            <p className="text-gray-500 font-medium">Smart Moderator Environment</p>
+            <h1 className="text-3xl font-black text-zinc-950 tracking-tight">Create New Order</h1>
+            <p className="text-zinc-500 font-black text-[10px] uppercase tracking-widest">Anzaar-Vortex Console Environment</p>
           </div>
         </div>
         
@@ -81,34 +81,34 @@ export default function NewOrderPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-2xl mx-auto bg-white p-12 rounded-[40px] border border-gray-100 shadow-2xl text-center space-y-8"
+          className="max-w-2xl mx-auto bg-white p-12 rounded-[40px] border border-black/5 shadow-2xl text-center space-y-8"
         >
-          <div className="w-20 h-20 bg-emerald-100 text-emerald-900 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-20 h-20 bg-zinc-950 text-white rounded-full flex items-center justify-center mx-auto shadow-xl shadow-zinc-950/20">
              <CheckCircle2 className="w-10 h-10" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-serif font-bold text-emerald-950">Luxury Order Confirmed!</h2>
-            <p className="text-gray-500">The invoice has been generated and downloaded as a JPG.</p>
+            <h2 className="text-3xl font-black text-zinc-950 tracking-tighter uppercase leading-none">Order Confirmed!</h2>
+            <p className="text-zinc-400 text-[9px] font-black uppercase tracking-widest">The secure invoice has been encrypted and downloaded.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             <button 
-              onClick={() => downloadInvoice(lastOrder)}
-              className="flex items-center justify-center gap-2 p-4 bg-emerald-900 text-white rounded-2xl font-bold hover:bg-emerald-950 transition-all shadow-lg"
-             >
-               <Download className="w-5 h-5" />
-               Download Again
-             </button>
-             <button 
-              onClick={() => setLastOrder(null)}
-              className="flex items-center justify-center gap-2 p-4 bg-gray-50 text-emerald-950 border border-gray-100 rounded-2xl font-bold hover:bg-gray-100 transition-all"
-             >
-                <PlusCircle className="w-5 h-5" />
-                New Order
-             </button>
+              <button 
+               onClick={() => downloadInvoice(lastOrder)}
+               className="flex items-center justify-center gap-2 p-4 bg-zinc-950 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95"
+              >
+                <Download className="w-5 h-5" />
+                Download Again
+              </button>
+              <button 
+               onClick={() => setLastOrder(null)}
+               className="flex items-center justify-center gap-2 p-4 bg-zinc-50 text-zinc-950 border border-black/5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-sm active:scale-95"
+              >
+                 <PlusCircle className="w-5 h-5" />
+                 New Entry
+              </button>
           </div>
 
-          <div className="pt-8 border-t border-gray-50 flex items-center justify-center gap-4 text-gray-400 text-sm italic">
+          <div className="pt-8 border-t border-gray-50 flex items-center justify-center gap-4 text-gray-400 text-sm">
              <Share2 className="w-4 h-4" />
              Ready to share via WhatsApp or Messenger
           </div>

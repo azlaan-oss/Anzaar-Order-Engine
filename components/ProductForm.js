@@ -15,7 +15,8 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
     basePrice: '',
     discount: '0',
     category: 'Abaya',
-    variants: []
+    variants: [],
+    isStockOut: false
   });
   const [activeVariantIdx, setActiveVariantIdx] = useState(null);
   const [mounted, setMounted] = useState(false);
@@ -28,8 +29,14 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
     if (editData) {
       setProduct({
         ...editData,
+        isStockOut: editData.isStockOut || false,
         // Convert URLs to previews for display
-        variants: editData.variants.map(v => ({ ...v, preview: v.imageUrl, id: v.sku || Date.now() + Math.random() }))
+        variants: editData.variants.map(v => ({ 
+          ...v, 
+          isStockOut: v.isStockOut || false,
+          preview: v.imageUrl, 
+          id: v.sku || Date.now() + Math.random() 
+        }))
       });
     }
   }, [editData]);
@@ -65,7 +72,8 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
             image: compressed, 
             preview,
             stock: 0,
-            threshold: 2
+            threshold: 2,
+            isStockOut: false
           };
         })
       );
@@ -163,12 +171,13 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
       const updatedVariants = await Promise.all(
         product.variants.map(async (v) => {
           if (v.image) {
-            const url = await uploadProductImage(v.image, product.name);
+            const url = await uploadProductImage(v.image, product.name, v.color || 'Standard');
             return { 
               color: v.color || 'Standard', 
               imageUrl: url || '', 
               stock: parseInt(v.stock) || 0,
               threshold: parseInt(v.threshold) || 2,
+              isStockOut: v.isStockOut || false,
               sku: v.sku || `${product.name.toUpperCase().replace(/\s+/g, '-')}-${(v.color || 'ST').toUpperCase()}`
             };
           }
@@ -177,6 +186,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
             imageUrl: v.imageUrl || '', 
             stock: parseInt(v.stock) || 0,
             threshold: parseInt(v.threshold) || 2,
+            isStockOut: v.isStockOut || false,
             sku: v.sku || `${product.name.toUpperCase().replace(/\s+/g, '-')}-${(v.color || 'ST').toUpperCase()}`
           };
         })
@@ -186,6 +196,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
         ...product,
         basePrice: parseFloat(product.basePrice),
         discount: parseFloat(product.discount) || 0,
+        isStockOut: product.isStockOut || false,
         variants: updatedVariants
       };
 
@@ -207,20 +218,40 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-2xl space-y-8 max-h-[85vh] overflow-y-auto custom-scrollbar relative">
+    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-[3rem] border border-black/5 shadow-2xl space-y-8 max-h-[85vh] overflow-y-auto custom-scrollbar relative">
       {onClose && (
         <button type="button" onClick={onClose} className="absolute top-6 right-6 p-2 bg-gray-50 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all">
           <X className="w-5 h-5" />
         </button>
       )}
 
-      <div className="space-y-2">
-        <h2 className="text-3xl font-serif font-black text-emerald-950">
-          {editData ? 'Edit Product' : 'Add New Product'}
-        </h2>
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-          {editData ? `Managing: ${editData.name}` : 'Fill in the details to add this to your inventory'}
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-serif font-black text-zinc-950">
+            {editData ? 'Edit Product' : 'Add New Product'}
+          </h2>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            {editData ? `Managing: ${editData.name}` : 'Fill in the details to add this to your inventory'}
+          </p>
+        </div>
+
+        {/* Master Stock Toggle */}
+        <div className={`flex items-center gap-4 px-6 py-3 rounded-2xl border transition-all ${product.isStockOut ? 'bg-red-50 border-red-100' : 'bg-zinc-50 border-zinc-100'}`}>
+          <div className="flex flex-col">
+            <span className={`text-[10px] font-black uppercase tracking-widest ${product.isStockOut ? 'text-red-600' : 'text-zinc-700'}`}>Stock Status</span>
+            <span className="text-xs font-bold text-gray-500">{product.isStockOut ? 'Currently Unavailable' : 'Available for Orders'}</span>
+          </div>
+          <button 
+            type="button"
+            onClick={() => setProduct({ ...product, isStockOut: !product.isStockOut })}
+            className={`w-14 h-7 rounded-full p-1 relative transition-colors duration-500 ${product.isStockOut ? 'bg-red-500' : 'bg-zinc-950'}`}
+          >
+            <motion.div 
+              animate={{ x: product.isStockOut ? 28 : 0 }}
+              className="w-5 h-5 bg-white rounded-full shadow-lg"
+            />
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -231,7 +262,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
             required
             value={product.name}
             onChange={(e) => setProduct({...product, name: e.target.value})}
-            className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-4 rounded-2xl focus:ring-4 focus:ring-emerald-900/5 focus:outline-none transition-all font-bold"
+            className="w-full bg-zinc-50 text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-4 focus:ring-zinc-950/5 focus:outline-none transition-all font-bold placeholder:text-zinc-200"
             placeholder="Product Name"
           />
         </div>
@@ -242,7 +273,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
             required
             value={product.basePrice}
             onChange={(e) => setProduct({...product, basePrice: e.target.value})}
-            className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-4 rounded-2xl focus:ring-4 focus:ring-emerald-900/5 focus:outline-none transition-all font-bold"
+            className="w-full bg-zinc-50 text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-4 focus:ring-zinc-950/5 focus:outline-none transition-all font-bold placeholder:text-zinc-200"
             placeholder="Price"
           />
         </div>
@@ -252,7 +283,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
             type="number" 
             value={product.discount}
             onChange={(e) => setProduct({...product, discount: e.target.value})}
-            className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-4 rounded-2xl focus:ring-4 focus:ring-emerald-900/5 focus:outline-none transition-all font-bold"
+            className="w-full bg-zinc-50 text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-4 focus:ring-zinc-950/5 focus:outline-none transition-all font-bold placeholder:text-zinc-200"
             placeholder="0"
           />
         </div>
@@ -261,8 +292,8 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
       {/* Variant Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-            <h3 className="font-serif font-black text-xl text-emerald-950">Tone Variations</h3>
-            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{product.variants.length} Active SKUs</span>
+            <h3 className="font-serif font-black text-xl text-zinc-950">Color Variants</h3>
+            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{product.variants.length} Active Colors</span>
         </div>
         
         <div className="flex flex-wrap gap-6">
@@ -273,7 +304,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                className="relative group w-36 h-48 bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                className="relative group w-36 h-48 bg-white rounded-3xl border border-black/5 overflow-hidden shadow-sm hover:shadow-xl transition-all"
               >
                  <img 
                    src={v.preview || v.imageUrl} 
@@ -281,31 +312,36 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
                    alt={v.color} 
                    onClick={() => setActiveVariantIdx(idx)}
                  />
-                 <div className="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+
+                 {/* Instant Remove Cross */}
+                 <button 
+                   type="button"
+                   onClick={(e) => { e.stopPropagation(); removeVariant(v.id); }}
+                   className="absolute top-2 right-2 p-1.5 bg-white/90 text-zinc-400 hover:text-red-500 rounded-full shadow-lg border border-black/5 opacity-0 group-hover:opacity-100 transition-all z-10"
+                 >
+                    <X className="w-3 h-3" />
+                 </button>
+
+                 <div className="absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                     <button 
                       type="button"
                       onClick={() => setActiveVariantIdx(idx)}
-                      className="text-white text-[8px] font-black uppercase tracking-widest bg-emerald-900/40 px-4 py-2 rounded-full border border-white/20 hover:bg-emerald-900 flex items-center gap-2 backdrop-blur-md"
+                      className="text-zinc-950 text-[8px] font-black uppercase tracking-widest bg-white px-4 py-2 rounded-full border border-black/5 hover:bg-zinc-50 flex items-center gap-2 shadow-lg"
                     >
-                      <Sparkles className="w-3 h-3 text-gold-400" />
-                      Deep Inspect
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      View Details
                     </button>
                  </div>
-                <div className="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-md p-3">
-                   <p className="text-[10px] font-black text-emerald-950 text-center uppercase tracking-tighter truncate">{v.color}</p>
-                    {/* Stock removed per request */}
-                    {/* <div className="flex justify-center gap-2 mt-1">
-                       <span className="text-[8px] font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full">S: {v.stock}</span>
-                       <span className="text-[8px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-full">M: {v.threshold}</span>
-                    </div> */}
+                 <div className="absolute inset-x-0 bottom-0 py-2 bg-white/50 backdrop-blur-md border-t border-black/5">
+                   <p className="text-[10px] font-black text-zinc-950 text-center uppercase tracking-tighter truncate">{v.color}</p>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
 
           {/* Add New Variant Box */}
-          <div className="w-36 h-48 border-4 border-dashed border-gray-50 rounded-[2.5rem] flex flex-col items-center justify-center gap-3 bg-gray-50/30 hover:bg-emerald-50 hover:border-emerald-100 transition-all relative group">
-            <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all">
+          <div className="w-36 h-48 border-4 border-dashed border-black/5 rounded-[2.5rem] flex flex-col items-center justify-center gap-3 bg-zinc-50 hover:bg-zinc-100 hover:border-black/10 transition-all relative group">
+            <div className="bg-white p-4 rounded-2xl shadow-sm group-hover:bg-zinc-950 group-hover:text-white transition-all text-zinc-400">
                <Upload className="w-6 h-6" />
             </div>
             <input 
@@ -315,9 +351,9 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
               onChange={handleAddVariant}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
-            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center px-4">
-              Upload Color Tones<br/>
-              <span className="text-[8px] opacity-60">(Multi-select enabled)</span>
+            <span className="text-[10px] text-zinc-300 font-bold uppercase tracking-widest text-center px-4">
+              Add Colors<br/>
+              <span className="text-[8px] opacity-60">(Select one or more)</span>
             </span>
           </div>
         </div>
@@ -342,7 +378,7 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
         <button 
           type="submit" 
           disabled={loading}
-          className="flex-[2] bg-emerald-900 text-gold-400 px-8 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-900/20 hover:bg-emerald-950 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+          className="flex-[2] bg-zinc-950 text-white px-8 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-zinc-950/10 hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
         >
           {loading ? (
             <div className="w-5 h-5 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
@@ -353,162 +389,155 @@ export default function ProductForm({ onSuccess, editData = null, onClose = null
         </button>
       </div>
 
-      <AnimatePresence>
-        {mounted && activeVariantIdx !== null && createPortal(
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] bg-emerald-950/95 backdrop-blur-2xl flex flex-col"
-          >
-            {/* Control Header */}
-            <div className="p-8 flex items-center justify-between border-b border-white/10">
-               <div className="flex items-center gap-4">
-                  <div className="bg-emerald-900 p-3 rounded-2xl">
-                     <ImageIcon className="text-gold-400 w-6 h-6" />
-                  </div>
-                  <div>
-                     <h3 className="text-white text-xl font-serif font-black">
-                        {product.variants[activeVariantIdx]?.color || 'Loading...'}
-                     </h3>
-                     <p className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">
-                        Master Variation Portal • {activeVariantIdx + 1}/{product.variants.length}
-                     </p>
-                  </div>
-               </div>
-               <button 
-                 type="button"
-                 onClick={() => setActiveVariantIdx(null)}
-                 className="bg-white/5 hover:bg-red-500 text-white p-4 rounded-full transition-all"
-               >
-                 <X className="w-6 h-6" />
-               </button>
-            </div>
+      {/* Deep Variant Inspector Modal */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {activeVariantIdx !== null && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[1000000] bg-zinc-50/98 backdrop-blur-2xl flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Control Header */}
+              <div className="p-8 flex items-center justify-between border-b border-black/5">
+                 <div className="flex items-center gap-4">
+                    <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5">
+                       <ImageIcon className="text-zinc-400 w-6 h-6" />
+                    </div>
+                    <div>
+                       <h3 className="text-zinc-950 text-xl font-serif font-black">
+                          {product.variants[activeVariantIdx]?.color || 'Loading...'}
+                       </h3>
+                       <p className="text-zinc-400 text-[10px] uppercase font-bold tracking-[0.2em]">
+                          Master Variation Portal • {activeVariantIdx + 1}/{product.variants.length}
+                       </p>
+                    </div>
+                 </div>
+                 <button 
+                   type="button"
+                   onClick={() => setActiveVariantIdx(null)}
+                   className="bg-white hover:bg-red-50 text-zinc-400 hover:text-red-500 p-4 rounded-full transition-all border border-black/5 shadow-sm"
+                 >
+                   <X className="w-6 h-6" />
+                 </button>
+              </div>
 
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-               {/* Image Section */}
-               <div className="flex-1 relative flex items-center justify-center bg-black/20 group">
-                  <button 
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setActiveVariantIdx((activeVariantIdx - 1 + product.variants.length) % product.variants.length); }}
-                    className="absolute left-8 z-10 p-5 bg-white/5 hover:bg-white/10 text-white rounded-full backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-all border border-white/5"
-                  >
-                     <ChevronRight className="w-8 h-8 rotate-180" />
-                  </button>
-                  
-                  <motion.img 
-                    key={activeVariantIdx}
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -100, opacity: 0 }}
-                    src={product.variants[activeVariantIdx]?.preview || product.variants[activeVariantIdx]?.imageUrl} 
-                    className="max-w-full max-h-full object-contain p-12"
-                  />
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                 {/* Image Section */}
+                 <div className="flex-1 relative flex items-center justify-center bg-zinc-100/50 group">
+                    <button 
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActiveVariantIdx((activeVariantIdx - 1 + product.variants.length) % product.variants.length); }}
+                      className="absolute left-8 z-10 p-5 bg-white text-zinc-950 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all border border-black/5"
+                    >
+                       <ChevronRight className="w-8 h-8 rotate-180" />
+                    </button>
+                    
+                    <motion.img 
+                      key={activeVariantIdx}
+                      initial={{ x: 100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -100, opacity: 0 }}
+                      src={product.variants[activeVariantIdx]?.preview || product.variants[activeVariantIdx]?.imageUrl} 
+                      className="max-w-full max-h-full object-contain p-12 drop-shadow-2xl"
+                    />
 
-                  <button 
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setActiveVariantIdx((activeVariantIdx + 1) % product.variants.length); }}
-                    className="absolute right-8 z-10 p-5 bg-white/5 hover:bg-white/10 text-white rounded-full backdrop-blur-xl opacity-0 group-hover:opacity-100 transition-all border border-white/5"
-                  >
-                     <ChevronRight className="w-8 h-8" />
-                  </button>
-               </div>
+                    <button 
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActiveVariantIdx((activeVariantIdx + 1) % product.variants.length); }}
+                      className="absolute right-8 z-10 p-5 bg-white text-zinc-950 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transition-all border border-black/5"
+                    >
+                       <ChevronRight className="w-8 h-8" />
+                    </button>
+                 </div>
 
-               {/* Interaction Panel */}
-               <div className="w-full md:w-[450px] bg-emerald-950 p-12 flex flex-col gap-12 border-l border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-                  <div className="space-y-8">
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest pl-1">Modify Color Alias</label>
-                        <input 
-                           type="text"
-                           value={product.variants[activeVariantIdx]?.color || ''}
-                           onChange={(e) => {
+                 {/* Interaction Panel */}
+                  <div className="w-full md:w-[450px] bg-white p-12 flex flex-col gap-12 border-l border-black/5 shadow-2xl">
+                    <div className="space-y-8">
+                       <div className="space-y-3">
+                          <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest pl-1">Modify Color Alias</label>
+                          <input 
+                             type="text"
+                             value={product.variants[activeVariantIdx]?.color || ''}
+                             onChange={(e) => {
+                                const newVariants = [...product.variants];
+                                if (newVariants[activeVariantIdx]) {
+                                   newVariants[activeVariantIdx].color = e.target.value;
+                                   setProduct({...product, variants: newVariants});
+                                }
+                             }}
+                             onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                             className="w-full bg-zinc-50 text-zinc-950 border border-black/5 p-5 rounded-3xl text-sm font-bold focus:ring-4 focus:ring-zinc-950/5 focus:outline-none transition-all"
+                          />
+                       </div>
+
+                       {/* Variant Stock Toggle */}
+                       <div className={`p-6 rounded-[2rem] border transition-all flex items-center justify-between ${product.variants[activeVariantIdx]?.isStockOut ? 'bg-red-50 border-red-100' : 'bg-zinc-50 border-black/5'}`}>
+                          <div className="space-y-1">
+                             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Variation Availability</p>
+                             <p className={`text-sm font-bold ${product.variants[activeVariantIdx]?.isStockOut ? 'text-red-500' : 'text-zinc-600'}`}>
+                                {product.variants[activeVariantIdx]?.isStockOut ? 'Stock Out' : 'Available'}
+                             </p>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => {
                               const newVariants = [...product.variants];
-                              if (newVariants[activeVariantIdx]) {
-                                 newVariants[activeVariantIdx].color = e.target.value;
-                                 setProduct({...product, variants: newVariants});
-                              }
-                           }}
-                           onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-                           className="w-full bg-white/5 text-white border border-white/10 p-5 rounded-3xl text-sm font-bold focus:ring-4 focus:ring-emerald-500/20 focus:outline-none transition-all"
-                        />
-                     </div>
+                              newVariants[activeVariantIdx].isStockOut = !newVariants[activeVariantIdx].isStockOut;
+                              setProduct({ ...product, variants: newVariants });
+                            }}
+                            className={`w-14 h-7 rounded-full p-1 relative transition-colors duration-500 ${product.variants[activeVariantIdx]?.isStockOut ? 'bg-red-500' : 'bg-zinc-950'}`}
+                          >
+                            <motion.div 
+                              animate={{ x: product.variants[activeVariantIdx]?.isStockOut ? 28 : 0 }}
+                              className="w-5 h-5 bg-white rounded-full shadow-lg"
+                            />
+                          </button>
+                       </div>
 
-                     <div className="hidden grid grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest pl-1">In Stock</label>
-                           <input 
-                              type="number"
-                              value={product.variants[activeVariantIdx]?.stock || 0}
-                              onChange={(e) => {
-                                 const newVariants = [...product.variants];
-                                 if (newVariants[activeVariantIdx]) {
-                                    newVariants[activeVariantIdx].stock = e.target.value;
-                                    setProduct({...product, variants: newVariants});
-                                 }
-                              }}
-                              onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-                              className="w-full bg-white/5 text-white border border-white/10 p-5 rounded-3xl text-sm font-bold focus:outline-none"
-                           />
-                        </div>
-                        <div className="space-y-3">
-                           <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest pl-1">Low Alert</label>
-                           <input 
-                              type="number"
-                              value={product.variants[activeVariantIdx]?.threshold || 2}
-                              onChange={(e) => {
-                                 const newVariants = [...product.variants];
-                                 if (newVariants[activeVariantIdx]) {
-                                    newVariants[activeVariantIdx].threshold = e.target.value;
-                                    setProduct({...product, variants: newVariants});
-                                 }
-                              }}
-                              onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-                              className="w-full bg-white/5 text-white border border-white/10 p-5 rounded-3xl text-sm font-bold focus:outline-none"
-                           />
-                        </div>
-                     </div>
+                       <div className="pt-8 flex flex-col gap-4">
+                          <label className="w-full bg-zinc-950 text-white py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 cursor-pointer hover:bg-black transition-all shadow-xl active:scale-95">
+                             <Upload className="w-5 h-5" />
+                             Replace Core Image
+                             <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={(e) => updateVariantImage(product.variants[activeVariantIdx].id, e.target.files[0])}
+                             />
+                          </label>
 
-                     <div className="pt-8 flex flex-col gap-4">
-                        <label className="w-full bg-emerald-500 text-emerald-950 py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 cursor-pointer hover:bg-gold-400 transition-all shadow-xl active:scale-95">
-                           <Upload className="w-5 h-5" />
-                           Replace Core Image
-                           <input 
-                              type="file" 
-                              className="hidden" 
-                              accept="image/*"
-                              onChange={(e) => updateVariantImage(product.variants[activeVariantIdx].id, e.target.files[0])}
-                           />
-                        </label>
+                          <button 
+                             type="button"
+                             onClick={() => {
+                                const vId = product.variants[activeVariantIdx].id;
+                                setActiveVariantIdx(null);
+                                removeVariant(vId);
+                             }}
+                             className="w-full bg-white text-red-500 border border-black/5 py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-red-50 hover:border-red-100 transition-all shadow-sm"
+                          >
+                             <Trash2 className="w-5 h-5" />
+                             Evict Variant
+                          </button>
+                       </div>
+                    </div>
 
-                        <button 
-                           type="button"
-                           onClick={() => {
-                              const vId = product.variants[activeVariantIdx].id;
-                              setActiveVariantIdx(null);
-                              removeVariant(vId);
-                           }}
-                           className="w-full bg-white/5 text-red-400 border border-red-500/20 py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-red-500 hover:text-white transition-all"
-                        >
-                           <Trash2 className="w-5 h-5" />
-                           Evict Variant
-                        </button>
-                     </div>
-                  </div>
-
-                  <div className="mt-auto bg-white/5 p-8 rounded-[3rem] border border-white/5 space-y-4">
-                     <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Live Metadata SKU</span>
-                     </div>
-                     <p className="text-white text-xs font-mono break-all opacity-80">{product.variants[activeVariantIdx]?.sku || 'GENERATING ON COMMIT...'}</p>
-                  </div>
-               </div>
-            </div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+                    <div className="mt-auto bg-zinc-50 p-8 rounded-[3rem] border border-black/5 space-y-4">
+                       <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-zinc-950 animate-ping" />
+                          <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Live Metadata SKU</span>
+                       </div>
+                       <p className="text-zinc-950 text-xs font-mono break-all opacity-60">{product.variants[activeVariantIdx]?.sku || 'GENERATING ON COMMIT...'}</p>
+                    </div>
+                 </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </form>
   );
 }

@@ -151,82 +151,82 @@ export default function OrderDetailModal({ order, onClose }) {
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-emerald-950/80"
+        className="absolute inset-0 bg-zinc-950/30 backdrop-blur-sm"
       />
       
       <motion.div 
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative bg-white w-full max-w-5xl h-[92vh] md:h-full md:max-h-[85vh] rounded-t-[3rem] md:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row mt-auto md:mt-0"
+        className="relative glass-panel w-full max-w-5xl h-[94vh] md:h-full md:max-h-[85vh] rounded-t-[3rem] md:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row mt-auto md:mt-0 border border-black/5 bg-white"
       >
         {/* Main Content Area */}
-         <div className="flex-1 overflow-y-auto p-6 sm:p-12 space-y-10 custom-scrollbar">
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-6 overflow-hidden">
-               <div className="min-w-0 pr-12 sm:pr-0">
-                 <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <span className="px-3 py-1 bg-emerald-50 text-emerald-900 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100">Order Details</span>
-                    {order.isUrgent && <span className="bg-red-50 text-red-600 text-[10px] font-black uppercase px-2 py-1 rounded-full border border-red-100 animate-pulse">Urgent</span>}
-                 </div>
-                 <h2 className="text-2xl sm:text-4xl font-serif font-black text-emerald-950 truncate">ID: #{order.orderId}</h2>
-                 <p className="text-gray-400 font-bold text-[10px] sm:text-xs uppercase tracking-widest mt-1">Date: {new Date(order.timestamp).toLocaleString()}</p>
+         <div className="flex-1 overflow-y-auto p-5 sm:p-12 space-y-8 md:space-y-10 custom-scrollbar pb-32 md:pb-12">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+               <div className="min-w-0 pr-8 md:pr-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                     <span className="px-3 py-1 bg-black/5 rounded-full text-zinc-400 text-[10px] font-black uppercase shadow-sm border border-black/5">Protocol Details</span>
+                     {order.isUrgent && <span className="bg-red-500 text-white text-[9px] font-black uppercase px-2 py-1 rounded-full border border-red-400 animate-pulse">Urgent</span>}
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-black text-zinc-950 truncate leading-none mt-2">#{order.orderId}</h2>
+                  <p className="text-zinc-400 font-bold text-[9px] md:text-xs uppercase tracking-[0.2em] mt-3">Timestamp: {new Date(order.timestamp).toLocaleString()}</p>
                </div>
-               <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+               <div className="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
                   <button 
                    onClick={handleDelete}
-                   className="flex-1 sm:flex-none p-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-sm flex items-center justify-center"
+                   className="flex-1 md:flex-none h-14 w-14 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-sm flex items-center justify-center border border-red-100/50"
                    title="Move to Trash"
                   >
-                    <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <Trash2 className="w-6 h-6" />
                   </button>
-                  <button onClick={onClose} className="flex-1 sm:flex-none p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all shadow-sm flex items-center justify-center">
-                     <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <button onClick={onClose} className="flex-1 md:flex-none h-14 w-14 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl flex items-center justify-center shadow-lg transition-all">
+                     <X className="w-6 h-6" />
                   </button>
                </div>
             </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Customer Capsule */}
-               <div className="bg-emerald-50/50 p-6 sm:p-8 rounded-[2rem] border border-emerald-100/50 space-y-6">
+               <div className="bg-black/5 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-black/5 space-y-6">
                   <div className="flex justify-between items-start">
-                     <h4 className="text-[10px] font-black text-emerald-900 uppercase tracking-widest flex items-center gap-2">
+                     <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                         <User className="w-3 h-3" /> Customer Info
                      </h4>
-                     <div className="bg-emerald-900 text-white text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest">
+                     <div className="bg-zinc-950 text-white text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest">
                         {customerStats.orderCount > 1 ? 'Returning' : 'New'}
                      </div>
                   </div>
                   <div className="space-y-3">
-                     <p className="text-xl sm:text-2xl font-serif font-black text-emerald-950">{order.customer.name}</p>
-                     <div className="flex items-center gap-2 text-sm font-bold text-emerald-800">
+                     <p className="text-xl sm:text-2xl font-black text-zinc-950">{order.customer.name}</p>
+                     <div className="flex items-center gap-2 text-sm font-bold text-zinc-500">
                         <Phone className="w-4 h-4 opacity-40" /> {order.customer.phone}
                      </div>
-                     <div className="flex items-start gap-2 text-sm font-medium text-gray-500 pt-2">
+                     <div className="flex items-start gap-2 text-sm font-medium text-zinc-600 pt-2">
                         <MapPin className="w-4 h-4 opacity-40 mt-1 shrink-0" /> {order.customer.address}
                      </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-emerald-100/50">
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-black/5">
                      <div>
-                        <p className="text-[8px] font-black text-emerald-900/40 uppercase tracking-widest">Total Orders</p>
-                        <p className="text-base sm:text-lg font-black text-emerald-950">{customerStats.orderCount}</p>
+                        <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Total Orders</p>
+                        <p className="text-base sm:text-lg font-black text-zinc-950">{customerStats.orderCount}</p>
                      </div>
                      <div>
-                        <p className="text-[8px] font-black text-emerald-900/40 uppercase tracking-widest">Total Spent</p>
-                        <p className="text-base sm:text-lg font-black text-emerald-950">৳ {customerStats.totalSpent.toLocaleString()}</p>
+                        <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Total Spent</p>
+                        <p className="text-base sm:text-lg font-black text-zinc-950">৳ {customerStats.totalSpent.toLocaleString()}</p>
                      </div>
                   </div>
                </div>
 
               {/* Finance Capsule */}
-               <div className="bg-gray-50 p-6 sm:p-8 rounded-[2rem] border border-gray-100 space-y-4">
-                  <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+               <div className="bg-gold-500/5 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-gold-400/20 space-y-4">
+                  <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                      <CreditCard className="w-3 h-3" /> Payment Details
                   </h4>
                   <div className="space-y-4">
-                     <div className="flex justify-between items-end border-b border-gray-200/50 pb-4">
-                        <span className="text-sm font-bold text-gray-400 uppercase">Total Amount</span>
-                        <span className="text-2xl sm:text-3xl font-black text-emerald-950">৳ {order.totals.total}</span>
+                     <div className="flex justify-between items-end border-b border-black/5 pb-4">
+                        <span className="text-sm font-bold text-zinc-400 uppercase">Total Amount</span>
+                        <span className="text-2xl sm:text-3xl font-black text-zinc-950">৳ {order.totals.total}</span>
                      </div>
                      {order.totals.due > 0 ? (
                        <div className="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
@@ -237,10 +237,10 @@ export default function OrderDetailModal({ order, onClose }) {
                          <span className="text-lg font-black text-red-600">৳ {order.totals.due}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                      <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-black/5">
                          <div className="flex items-center gap-3">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                            <span className="text-xs font-black text-emerald-900 uppercase tracking-widest">Fully Settled</span>
+                            <CheckCircle2 className="w-5 h-5 text-zinc-600" />
+                            <span className="text-xs font-black text-zinc-900 uppercase tracking-widest">Fully Settled</span>
                          </div>
                       </div>
                     )}
@@ -250,22 +250,22 @@ export default function OrderDetailModal({ order, onClose }) {
 
            {/* Items Suite */}
            <div className="space-y-6">
-              <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Breakdown of Elegance</h4>
+              <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest pl-2">Breakdown of Elegance</h4>
               <div className="space-y-4">
                  {order.items.map((item, idx) => (
-                   <div key={idx} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group">
+                   <div key={idx} className="bg-black/5 backdrop-blur-lg p-5 rounded-3xl border border-black/5 shadow-sm flex items-center justify-between group">
                       <div className="flex items-center gap-6">
                          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md">
                             <img src={item.image} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                          </div>
                          <div>
-                            <h5 className="font-serif font-black text-emerald-950 group-hover:text-emerald-700 transition-colors uppercase">{item.name}</h5>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{item.size} • {item.color}</p>
+                            <h5 className="font-black text-zinc-950 group-hover:text-zinc-600 transition-colors uppercase">{item.name}</h5>
+                            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">{item.size} • {item.color}</p>
                          </div>
                       </div>
                       <div className="text-right">
-                         <p className="text-xs font-bold text-gray-400 uppercase mb-1">x{item.quantity}</p>
-                         <p className="text-lg font-black text-emerald-950">৳ {item.price * item.quantity}</p>
+                         <p className="text-xs font-bold text-zinc-400 uppercase mb-1">x{item.quantity}</p>
+                         <p className="text-lg font-black text-zinc-950">৳ {item.price * item.quantity}</p>
                       </div>
                    </div>
                  ))}
@@ -273,17 +273,17 @@ export default function OrderDetailModal({ order, onClose }) {
            </div>
 
            <div className="pt-10 space-y-3">
-              <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest text-center">End of Order Specification</p>
+              <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest text-center">End of Order Specification</p>
            </div>
         </div>
 
         {/* History Sidebar */}
-        <div className="w-full md:w-80 bg-gray-50/50 border-t md:border-t-0 md:border-l border-gray-100 p-8 sm:p-12 flex flex-col shrink-0">
+        <div className="w-full md:w-80 bg-black/[0.02] backdrop-blur-3xl border-t md:border-t-0 md:border-l border-black/5 p-8 sm:p-12 flex flex-col shrink-0">
            <div className="flex items-center gap-3 mb-8">
-              <div className="bg-emerald-950 text-white p-2 rounded-xl">
+              <div className="bg-zinc-950 text-white p-2 rounded-xl">
                  <HistoryIcon className="w-5 h-5" />
               </div>
-              <h3 className="font-serif font-black text-xl text-emerald-950 uppercase tracking-tight">Order History</h3>
+              <h3 className="font-black text-xl text-zinc-950 uppercase tracking-tight">Order History</h3>
            </div>
 
            <div className="flex-1 md:overflow-y-auto space-y-8 custom-scrollbar relative pr-2">
@@ -294,18 +294,18 @@ export default function OrderDetailModal({ order, onClose }) {
                    {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl" />)}
                 </div>
               ) : activityLogs.length === 0 ? (
-                <div className="text-center py-20 text-gray-300">
+                <div className="text-center py-20 text-zinc-400">
                    <Clock className="w-10 h-10 mx-auto opacity-20 mb-3" />
                    <p className="text-[10px] font-bold uppercase tracking-widest">No activity history found</p>
                 </div>
               ) : (
                 activityLogs.map((log, i) => (
                   <div key={log.id} className="relative pl-10">
-                     <div className="absolute left-3 top-1 w-2.5 h-2.5 rounded-full bg-emerald-900 border-4 border-white shadow-sm z-10" />
+                     <div className="absolute left-3 top-1 w-2.5 h-2.5 rounded-full bg-zinc-950 border-4 border-white shadow-sm z-10" />
                      <div className="space-y-1">
-                        <p className="text-xs font-black text-emerald-950 uppercase tracking-tight">{log.action}</p>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{log.user}</p>
-                        <p className="text-[8px] font-medium text-gray-400 italic mt-2">
+                        <p className="text-xs font-black text-zinc-950 uppercase tracking-tight">{log.action}</p>
+                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{log.user}</p>
+                        <p className="text-[8px] font-medium text-zinc-500 mt-2">
                           {log.timestamp?.toDate ? new Date(log.timestamp.toDate()).toLocaleTimeString() : 'Recent'}
                         </p>
                      </div>
@@ -314,25 +314,25 @@ export default function OrderDetailModal({ order, onClose }) {
               )}
            </div>
 
-           <div className="mt-8 pt-8 border-t border-gray-200 space-y-6">
+           <div className="mt-8 pt-8 border-t border-black/5 space-y-6">
               <div className="space-y-2">
-                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Update Status</p>
+                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest pl-1">Update Status</p>
                  <select 
                   value={order.status || 'pending'}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   disabled={updatingStatus}
-                  className="w-full bg-white border border-gray-200 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-emerald-900/10 transition-all disabled:opacity-50"
+                  className="w-full bg-white border border-black/5 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-zinc-950/5 text-zinc-950 transition-all disabled:opacity-50"
                  >
-                    <option value="pending">Pending Review</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="shipped">Dispatched</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="canceled">Canceled</option>
+                    <option value="pending" className="text-zinc-950">Pending Review</option>
+                    <option value="confirmed" className="text-zinc-950">Confirmed</option>
+                    <option value="shipped" className="text-zinc-950">Dispatched</option>
+                    <option value="delivered" className="text-zinc-950">Delivered</option>
+                    <option value="canceled" className="text-zinc-950">Canceled</option>
                  </select>
               </div>
 
-              <div className="flex items-center gap-2 bg-emerald-950 text-gold-400 p-4 rounded-2xl shadow-xl">
-                 <Package className="w-5 h-5" />
+              <div className="flex items-center gap-2 bg-black/5 text-zinc-950 p-4 rounded-2xl shadow-sm border border-black/5">
+                 <Package className="w-5 h-5 text-zinc-400" />
                  <span className="text-[10px] font-black uppercase tracking-widest">Status: {order.status?.toUpperCase() || 'PENDING'}</span>
               </div>
 
@@ -340,7 +340,7 @@ export default function OrderDetailModal({ order, onClose }) {
                type="button"
                onClick={downloadInvoice}
                disabled={isGenerating}
-               className="w-full flex items-center justify-center gap-3 p-4 bg-emerald-900 hover:bg-emerald-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50"
+               className="w-full flex items-center justify-center gap-3 p-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
                  {isGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                  Download Invoice

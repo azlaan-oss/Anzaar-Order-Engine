@@ -53,12 +53,12 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-emerald-950 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] flex flex-col xl:flex-row relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#F3F4F6] flex flex-col xl:flex-row relative overflow-hidden font-sans text-zinc-950">
       
       {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.1)_0%,transparent_50%)] animate-pulse-slow mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[20%] w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1)_0%,transparent_60%)] animate-pulse-slow mix-blend-screen delay-1000" />
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03)_0%,transparent_50%)] animate-pulse-slow mix-blend-multiply" />
+        <div className="absolute bottom-[10%] right-[20%] w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_50%_50%,rgba(39,39,42,0.03)_0%,transparent_60%)] animate-pulse-slow mix-blend-multiply delay-1000" />
       </div>
 
       {/* Left: Enterprise Marketing Presentation */}
@@ -70,12 +70,12 @@ export default function LoginPage() {
           transition={{ duration: 0.8 }}
           className="flex items-center gap-4"
         >
-          <div className="w-12 h-12 bg-gold-400 rounded-2xl flex items-center justify-center shadow-lg shadow-gold-400/20">
-             <span className="font-serif font-black text-emerald-950 text-2xl">a</span>
+          <div className="w-12 h-12 bg-zinc-950 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-zinc-950/10">
+             <span className="font-bold text-2xl">a</span>
           </div>
           <div>
-            <h2 className="text-white font-serif font-black tracking-tight text-xl">ANZAAR</h2>
-            <p className="text-[10px] uppercase tracking-[0.4em] font-black text-gold-400/80 leading-none mt-1">Intelligence</p>
+            <h2 className="text-zinc-950 font-bold tracking-tight text-xl">ANZAAR</h2>
+            <p className="text-[10px] uppercase tracking-[0.4em] font-black text-zinc-400 leading-none mt-1">Intelligence</p>
           </div>
         </motion.div>
 
@@ -85,15 +85,15 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
-               <Zap className="w-3 h-3 text-gold-400 fill-gold-400" />
-               <span className="text-[10px] text-white/80 font-black uppercase tracking-widest">Enterprise Edition v4.0</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 mb-8 shadow-sm">
+               <Zap className="w-3 h-3 text-zinc-950" />
+               <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Enterprise Edition v4.0</span>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-serif font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50 tracking-tighter leading-[1.1] mb-8">
+            <h1 className="text-5xl lg:text-7xl font-bold text-zinc-950 tracking-tighter leading-[1.1] mb-8">
               Strategic Control<br/>
-              <span className="text-emerald-500 italic">Redefined.</span>
+              <span className="text-zinc-400">Redefined.</span>
             </h1>
-            <p className="text-lg lg:text-xl text-white/50 font-medium max-w-xl leading-relaxed mb-16 border-l-2 border-gold-400/30 pl-6">
+            <p className="text-lg lg:text-xl text-zinc-400 font-medium max-w-xl leading-relaxed mb-16 border-l-2 border-zinc-950 pl-6">
               Welcome to the central nervous system of Anzaar. A world-class order engine built exclusively to command high-end inventory and global logistics.
             </p>
           </motion.div>
@@ -105,48 +105,46 @@ export default function LoginPage() {
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 + (idx * 0.1) }}
-                className="flex items-start gap-6 p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all backdrop-blur-xl group"
+                className="flex items-start gap-6 p-6 rounded-[2rem] bg-white border border-black/5 hover:border-black/10 transition-all shadow-sm group"
               >
-                <div className="bg-emerald-950/50 p-4 rounded-2xl border border-white/5 group-hover:scale-110 transition-transform shadow-inner">
-                   <feature.icon className="w-6 h-6 text-gold-400" />
+                <div className="bg-zinc-50 p-4 rounded-2xl border border-black/5 group-hover:scale-110 transition-transform">
+                   <feature.icon className="w-6 h-6 text-zinc-950" />
                 </div>
                 <div>
-                   <h3 className="text-white font-black uppercase tracking-widest text-xs mb-2">{feature.title}</h3>
-                   <p className="text-white/40 text-[11px] leading-relaxed font-bold">{feature.desc}</p>
+                   <h3 className="text-zinc-950 font-black uppercase tracking-widest text-xs mb-2">{feature.title}</h3>
+                   <p className="text-zinc-400 text-[11px] leading-relaxed font-bold">{feature.desc}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
 
-        <motion.div 
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           transition={{ delay: 1 }}
-           className="flex items-center gap-6 mt-20"
-        >
-           <div className="flex -space-x-4">
-              {[1,2,3].map(i => (
-                <div key={i} className={`w-10 h-10 rounded-full border-2 border-emerald-950 bg-emerald-${i*200} flex items-center justify-center`}>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-950" />
-                </div>
-              ))}
-           </div>
-           <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Trusted by the Anzaar Global Network</p>
-        </motion.div>
+         <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="flex items-center gap-6 mt-20"
+         >
+            <div className="flex -space-x-4">
+               {[1,2,3].map(i => (
+                 <div key={i} className={`w-10 h-10 rounded-full border-2 border-[#F3F4F6] bg-white flex items-center justify-center shadow-sm`}>
+                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                 </div>
+               ))}
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Trusted by the Anzaar Global Network</p>
+         </motion.div>
 
       </div>
 
       {/* Right: Security & Login Portal */}
-      <div className="w-full xl:w-[600px] 2xl:w-[700px] min-h-screen bg-emerald-950/80 backdrop-blur-3xl border-l border-white/5 flex flex-col items-center justify-center p-6 md:p-12 lg:p-20 relative z-20 shadow-2xl">
+      <div className="w-full xl:w-[600px] 2xl:w-[700px] min-h-screen bg-white/40 backdrop-blur-3xl border-l border-black/5 flex flex-col items-center justify-center p-6 md:p-12 lg:p-20 relative z-20 shadow-2xl">
         
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="flex md:hidden flex-col items-center mb-12 w-full text-center">
-            <div className="w-16 h-16 bg-gold-400 rounded-[2rem] flex items-center justify-center shadow-lg shadow-gold-400/20 mb-6">
-               <span className="font-serif font-black text-emerald-950 text-4xl leading-none pt-1">a</span>
-            </div>
-            <h2 className="text-3xl font-serif font-black text-white tracking-tighter">ANZAAR</h2>
-            <p className="text-[10px] uppercase tracking-[0.4em] font-black text-gold-400/80 leading-none mt-2">Intelligence</p>
+            <div className="w-16 h-16 bg-zinc-950 rounded-[2rem] flex items-center justify-center shadow-lg shadow-zinc-950/10 mb-6 font-bold text-white text-4xl">a</div>
+            <h2 className="text-3xl font-bold text-zinc-950 tracking-tighter">ANZAAR</h2>
+            <p className="text-[10px] uppercase tracking-[0.4em] font-black text-zinc-400 leading-none mt-2">Intelligence</p>
         </div>
 
         <motion.div 
@@ -155,27 +153,27 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          <div className="mb-10 lg:mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-md mb-6">
+           <div className="mb-10 lg:mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 border border-red-100 rounded-md mb-6">
                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-               <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">Restricted Area</span>
+               <span className="text-[9px] font-black text-red-500 uppercase tracking-widest">Restricted Area</span>
             </div>
-            <h2 className="text-3xl lg:text-4xl font-serif font-black text-white tracking-tight mb-3">Agent Login</h2>
-            <p className="text-white/40 text-xs font-medium leading-relaxed">
+            <h2 className="text-3xl lg:text-4xl font-bold text-zinc-950 tracking-tight mb-3">Agent Login</h2>
+            <p className="text-zinc-400 text-xs font-medium leading-relaxed">
               Enter your credentials to access the operational mainframe. All login attempts are recorded and monitored.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-white/50 pl-2">Operational Email</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 pl-2">Operational Email</label>
               <div className="relative group">
-                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 group-focus-within:text-gold-400 transition-colors" />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300 group-focus-within:text-zinc-950 transition-colors" />
                 <input 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/20 border-2 border-white/5 text-white p-5 pl-14 rounded-3xl outline-none focus:border-gold-400/30 transition-all font-bold text-sm shadow-inner"
+                  className="w-full bg-white border border-black/5 text-zinc-950 p-5 pl-14 rounded-3xl outline-none focus:border-zinc-950/20 focus:ring-4 focus:ring-zinc-900/5 transition-all font-bold text-sm shadow-sm"
                   placeholder="agent@anzaar.com"
                   required
                 />
@@ -184,16 +182,16 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between pl-2 pr-4">
-                 <label className="text-[10px] font-black uppercase tracking-widest text-white/50">Passcode</label>
-                 <span className="text-[9px] font-black text-gold-400/50 hover:text-gold-400 cursor-pointer uppercase tracking-widest transition-colors">Forgot?</span>
+                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Passcode</label>
+                 <span className="text-[9px] font-black text-zinc-300 hover:text-zinc-950 cursor-pointer uppercase tracking-widest transition-colors">Forgot?</span>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 group-focus-within:text-gold-400 transition-colors" />
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300 group-focus-within:text-zinc-950 transition-colors" />
                 <input 
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/20 border-2 border-white/5 text-white p-5 pl-14 rounded-3xl outline-none focus:border-gold-400/30 transition-all font-bold text-sm shadow-inner tracking-widest"
+                  className="w-full bg-white border border-black/5 text-zinc-950 p-5 pl-14 rounded-3xl outline-none focus:border-zinc-950/20 focus:ring-4 focus:ring-zinc-900/5 transition-all font-bold text-sm shadow-sm tracking-widest"
                   placeholder="••••••••"
                   required
                 />
@@ -203,7 +201,7 @@ export default function LoginPage() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-gold-400 to-gold-500 text-emerald-950 p-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_-10px_rgba(212,175,55,0.4)] hover:shadow-[0_0_60px_-10px_rgba(212,175,55,0.6)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 group mt-10"
+              className="w-full bg-zinc-950 text-white p-6 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-zinc-950/20 hover:bg-black hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 group mt-10"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : (
                 <>
@@ -214,14 +212,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-16 pt-8 border-t-2 border-white/5">
-             <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="bg-emerald-500/20 p-2 rounded-xl border border-emerald-500/30">
-                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="mt-16 pt-8 border-t border-black/5 w-full">
+             <div className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-black/5 shadow-sm">
+                <div className="bg-zinc-50 p-2 rounded-xl border border-black/5">
+                   <ShieldCheck className="w-4 h-4 text-zinc-400" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-black text-white/80 uppercase tracking-widest mb-0.5">End-to-End Encrypted</p>
-                   <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">AES-256 Military Grade Standard</p>
+                   <p className="text-[10px] font-black text-zinc-950 uppercase tracking-widest mb-0.5">End-to-End Encrypted</p>
+                   <p className="text-[8px] font-black text-zinc-300 uppercase tracking-[0.2em]">AES-256 Military Grade Standard</p>
                 </div>
              </div>
           </div>
@@ -229,9 +227,9 @@ export default function LoginPage() {
 
         {/* Small floating status indicators bottom right */}
         <div className="absolute bottom-8 right-8 flex items-center gap-2">
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping absolute" />
-           <div className="w-2 h-2 rounded-full bg-emerald-500 relative" />
-           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20">System Online</span>
+           <div className="w-2 h-2 rounded-full bg-zinc-950 animate-ping absolute" />
+           <div className="w-2 h-2 rounded-full bg-zinc-950 relative" />
+           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-300">System Online</span>
         </div>
 
       </div>

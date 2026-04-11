@@ -1,24 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../../../lib/firebase';
-import { collection, query, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, updateDoc, deleteField } from 'firebase/firestore';
 import { useAuth } from '../../../lib/auth-context';
-import { ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '../../../lib/permissions';
+import { ROLES, PERMISSIONS, ROLE_PERMISSIONS, hasPermission } from '../../../lib/permissions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, 
   ShieldCheck, 
-  ShieldAlert, 
   Search, 
-  UserPlus, 
-  MoreVertical, 
-  Zap, 
   Fingerprint, 
   Activity,
-  ChevronRight,
   Shield,
-  Clock
+  Clock,
+  Zap,
+  Lock,
+  RotateCcw,
+  ShoppingBag,
+  BarChart3,
+  Package
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -27,7 +28,7 @@ export default function AccessControlPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
-  const { userData } = useAuth();
+  const { userData: currentAdmin } = useAuth();
 
   useEffect(() => {
     const q = query(collection(db, "users"));
@@ -38,20 +39,55 @@ export default function AccessControlPage() {
       }));
       setUsers(userList);
       setLoading(false);
+      
+      if (selectedUser) {
+        const updated = userList.find(u => u.id === selectedUser.id);
+        if (updated) setSelectedUser(updated);
+      }
     });
     return () => unsub();
-  }, []);
+  }, [selectedUser?.id]);
 
   const handleRoleChange = async (userId, newRole) => {
-    if (userData?.role !== ROLES.SUPER_ADMIN) {
-      toast.error("Security Breach: Only Super Admins can alter roles.");
+    if (currentAdmin?.role !== ROLES.SUPER_ADMIN) {
+      toast.error("Access Denied: Super Admin clearance required.");
       return;
     }
     try {
       await updateDoc(doc(db, "users", userId), { role: newRole });
-      toast.success(`Access level recalibrated to ${newRole.toUpperCase()}`);
+      toast.success(`Role recalibrated to ${newRole.toUpperCase()}`);
     } catch (err) {
-      toast.error("Recalibration failed. Quantum bypass detected.");
+      toast.error("Recalibration failed.");
+    }
+  };
+
+  const togglePermission = async (userId, permissionKey) => {
+    if (currentAdmin?.role !== ROLES.SUPER_ADMIN) {
+      toast.error("Unauthorized protocol bypass attempt.");
+      return;
+    }
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    const isCurrentlyAllowed = hasPermission(user, permissionKey);
+    const newState = !isCurrentlyAllowed;
+    try {
+      const updates = {};
+      updates[`customPermissions.${permissionKey}`] = newState;
+      await updateDoc(doc(db, "users", userId), updates);
+      toast.success(`${newState ? 'Granted' : 'Revoked'} access to ${permissionKey.replace('_', ' ')}`);
+    } catch (err) {
+      toast.error("Permission sync failed.");
+    }
+  };
+
+  const resetPermissions = async (userId) => {
+    const confirmation = window.confirm("Reset all custom overrides and revert to Role defaults?");
+    if (!confirmation) return;
+    try {
+      await updateDoc(doc(db, "users", userId), { customPermissions: deleteField() });
+      toast.info("Permissions reverted to Role standards.");
+    } catch (err) {
+      toast.error("Reset failed.");
     }
   };
 
@@ -60,218 +96,171 @@ export default function AccessControlPage() {
     u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-20">
-      
-      {/* Dynamic Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-             <div className="px-3 py-1 bg-emerald-950 text-gold-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-gold-400/20 shadow-lg">
-                Intelligence Center v1.2
-             </div>
-             <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-ping" />
-                <span className="text-gold-400 text-[9px] font-black uppercase tracking-widest italic font-serif">Secure Link Active</span>
-             </div>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-black text-emerald-950 tracking-tighter uppercase leading-none">Access Control</h1>
-          <p className="text-gray-400 font-medium text-sm md:text-base max-w-xl">
-             Manage system clearances and operational permissions for the global intelligence grid.
-          </p>
-        </div>
+  const permissionGroups = [
+    {
+      name: 'Tactical Operations',
+      icon: ShoppingBag,
+      perms: [
+        { key: PERMISSIONS.VIEW_ORDERS, label: 'Monitor Orders', desc: 'Allows viewing the global order grid' },
+        { key: PERMISSIONS.CREATE_ORDER, label: 'Initiate Order', desc: 'Allows placing new entry in the system' },
+        { key: PERMISSIONS.UPDATE_ORDER_STATUS, label: 'Modulate Status', desc: 'Allows changing delivery/payment status' },
+        { key: PERMISSIONS.DELETE_ORDER, label: 'Vaporize Order', desc: 'Allows moving orders to recovery vault' },
+      ]
+    },
+    {
+      name: 'Vault Management',
+      icon: Package,
+      perms: [
+        { key: PERMISSIONS.VIEW_VAULT, label: 'Scan Vault', desc: 'Allows browsing the product inventory' },
+        { key: PERMISSIONS.ADD_PRODUCT, label: 'Materialize Product', desc: 'Allows adding new items to vault' },
+        { key: PERMISSIONS.EDIT_PRODUCT, label: 'Recalibrate Gear', desc: 'Allows editing product specs/variants' },
+        { key: PERMISSIONS.DELETE_PRODUCT, label: 'Archival Protocol', desc: 'Allows deleting items from catalog' },
+      ]
+    },
+    {
+      name: 'Intelligence & Data',
+      icon: BarChart3,
+      perms: [
+        { key: PERMISSIONS.VIEW_REPORTS, label: 'Visual Intelligence', desc: 'Allows viewing sales/trend charts' },
+        { key: PERMISSIONS.EXPORT_DATA, label: 'Data Extraction', desc: 'Allows exporting sheets and csv' },
+      ]
+    },
+    {
+      name: 'System Framework',
+      icon: Shield,
+      perms: [
+        { key: PERMISSIONS.MANAGE_USERS, label: 'Governance', desc: 'Allows managing agents and clearances' },
+        { key: PERMISSIONS.EDIT_SETTINGS, label: 'Core Config', desc: 'Allows altering branding and API keys' },
+        { key: PERMISSIONS.VIEW_TRASH, label: 'Recovery Access', desc: 'Allows viewing the recycle bin' },
+        { key: PERMISSIONS.PURGE_TRASH, label: 'Permanent Destruction', desc: 'Allows instant vaporizing of trash' },
+      ]
+    }
+  ];
 
-        <div className="flex items-center gap-4">
-           <div className="relative group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-900/30 group-focus-within:text-gold-400 transition-colors" />
-              <input 
-                type="text"
-                placeholder="Search Digital ID..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="bg-white border-2 border-emerald-900/5 focus:border-gold-400/20 px-14 py-5 rounded-[2.5rem] outline-none text-sm font-bold w-full md:w-80 shadow-2xl transition-all"
-              />
+  if (loading) return (
+    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-8 space-y-4">
+       <div className="w-16 h-16 border-4 border-zinc-950/10 border-t-zinc-950 rounded-full animate-spin" />
+    </div>
+  );
+
+  return (
+    <div className="max-w-[1500px] mx-auto space-y-8 pb-20 px-4 md:px-0">
+            {/* Header */}
+       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-8 pt-4">
+         <div className="space-y-3">
+           <div className="flex items-center gap-3">
+              <div className="px-4 py-2 bg-white text-zinc-950 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border border-black/5 shadow-sm flex items-center gap-2">
+                 <Fingerprint className="w-3.5 h-3.5" />
+                 Access Matrix
+              </div>
+              <div className="hidden sm:flex items-center gap-2 bg-white border border-black/5 px-4 py-2 rounded-full shadow-sm">
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                 <span className="text-zinc-400 text-[9px] font-black uppercase tracking-widest">Connected</span>
+              </div>
            </div>
-        </div>
+           <h1 className="text-4xl md:text-6xl font-black text-zinc-950 tracking-tighter uppercase leading-none">Security <span className="text-zinc-300">Hub</span></h1>
+           <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.3em] max-w-xl">Calibrate micro-permissions and system clearances for personnel.</p>
+         </div>
+
+         <div className="relative group w-full xl:w-96">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
+            <input type="text" placeholder="Personnel Digital ID..." value={search} onChange={(e) => setSearch(e.target.value)} className="bg-white border border-black/5 px-14 py-5 rounded-[2.5rem] outline-none text-[10px] font-black uppercase tracking-[0.2em] w-full shadow-xl text-zinc-950 placeholder:text-zinc-200" />
+         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        
-        {/* User Intelligence Matrix */}
-        <div className="lg:col-span-8 space-y-6">
-           <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-2xl overflow-hidden relative group">
-              
-              {/* Animated Accent Line */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-gold-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
-              <div className="p-8 border-b border-gray-50 flex items-center justify-between">
-                 <div className="flex items-center gap-4">
-                    <div className="bg-emerald-950/5 p-3 rounded-2xl">
-                       <Fingerprint className="w-5 h-5 text-emerald-950" />
-                    </div>
-                    <div>
-                       <h3 className="text-lg font-serif font-black text-emerald-950 uppercase tracking-tight">Active Personnel</h3>
-                       <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none">Real-time clearance monitoring</p>
-                    </div>
-                 </div>
-                 <div className="flex items-center gap-3">
-                    <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                       {filteredUsers.length} Agents Online
-                    </div>
-                 </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50/50">
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-emerald-900 uppercase tracking-widest">Agent Identity</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-emerald-900 uppercase tracking-widest">Access Level</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-emerald-900 uppercase tracking-widest">Status</th>
-                      <th className="px-8 py-5 text-right text-[10px] font-black text-emerald-900 uppercase tracking-widest">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {filteredUsers.map((user) => (
-                      <motion.tr 
-                        key={user.id} 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`group hover:bg-emerald-50/30 transition-colors cursor-pointer ${selectedUser?.id === user.id ? 'bg-emerald-50/50' : ''}`}
-                        onClick={() => setSelectedUser(user)}
-                      >
-                        <td className="px-8 py-6">
-                           <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-950 to-emerald-800 flex items-center justify-center text-gold-400 font-serif font-black text-lg shadow-xl shadow-emerald-950/20 group-hover:scale-110 transition-transform">
-                                 {user.name?.[0] || user.email?.[0]?.toUpperCase()}
-                              </div>
-                              <div className="flex flex-col">
-                                 <span className="text-emerald-950 font-black uppercase tracking-tight text-sm">{user.name || 'Unknown Agent'}</span>
-                                 <span className="text-[10px] text-gray-400 font-mono italic">{user.email}</span>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="px-8 py-6">
-                           <div className="flex items-center gap-2">
-                              {user.role === ROLES.SUPER_ADMIN && <ShieldCheck className="w-4 h-4 text-emerald-600" />}
-                              {user.role === ROLES.MANAGER && <Shield className="w-4 h-4 text-gold-500" />}
-                              {user.role === ROLES.MODERATOR && <Clock className="w-4 h-4 text-blue-500" />}
-                              <span className={`text-[10px] font-black uppercase tracking-widest ${
-                                user.role === ROLES.SUPER_ADMIN ? 'text-emerald-700' :
-                                user.role === ROLES.MANAGER ? 'text-gold-600' :
-                                'text-gray-400'
-                              }`}>
-                                {user.role?.replace('_', ' ')}
-                              </span>
-                           </div>
-                        </td>
-                        <td className="px-8 py-6">
-                           <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-100 rounded-lg w-fit">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                              <span className="text-[8px] font-black text-emerald-900 uppercase">Secure</span>
-                           </div>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                           <button className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-emerald-950 hover:text-white transition-all">
-                              <MoreVertical className="w-4 h-4" />
-                           </button>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-           </div>
-
-           {/* Permission Preview Panel */}
-           <div className="bg-emerald-950 rounded-[4rem] p-12 text-white shadow-2xl relative overflow-hidden group">
-              <Zap className="absolute -bottom-10 -right-10 w-40 h-40 text-gold-400/5 group-hover:scale-125 transition-transform duration-1000" />
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-10 relative z-10">
-                 <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                       <Activity className="w-8 h-8 text-gold-400 animate-pulse" />
-                       <h4 className="text-2xl font-serif font-black uppercase italic tracking-tighter">Engine Health Monitor</h4>
-                    </div>
-                    <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] max-w-sm leading-relaxed">
-                      All protocols are operational. Real-time encryption active via Anzaar Core. Current clearance matrix satisfies all enterprise safety regulations.
-                    </p>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/5 backdrop-blur-xl">
-                       <p className="text-[9px] font-black uppercase text-gold-400 mb-1">Vault Sync</p>
-                       <p className="text-xl font-serif font-black italic">Active</p>
-                    </div>
-                    <div className="bg-gold-400 p-6 rounded-3xl border border-gold-400 shadow-xl shadow-gold-400/20">
-                       <p className="text-[9px] font-black uppercase text-emerald-950 mb-1">Protection</p>
-                       <p className="text-xl font-serif font-black italic text-emerald-950">1024-BIT</p>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </div>
-
-        {/* Tactical Control Panel */}
-        <div className="lg:col-span-4 space-y-10">
-           <AnimatePresence mode="wait">
-             {selectedUser ? (
-               <motion.div 
-                key={selectedUser.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="bg-white rounded-[3.5rem] border border-gray-100 shadow-2xl p-10 space-y-10 sticky top-10"
-               >
-                  <div className="flex flex-col items-center text-center space-y-4">
-                     <div className="w-24 h-24 rounded-[2.5rem] bg-emerald-950 flex items-center justify-center text-gold-400 text-3xl font-serif font-black border-4 border-gold-400/10 mb-4 ring-8 ring-emerald-50">
-                        {selectedUser.name?.[0] || selectedUser.email?.[0]?.toUpperCase()}
-                     </div>
-                     <div className="space-y-1">
-                        <h2 className="text-2xl font-serif font-black text-emerald-950 uppercase tracking-tighter">{selectedUser.name || 'Agent Unknown'}</h2>
-                        <p className="text-[10px] font-mono text-gray-400 leading-none">{selectedUser.email}</p>
-                     </div>
-                     <div className="flex items-center gap-2 px-6 py-2 bg-gray-50 rounded-full border border-gray-100 shadow-inner">
-                        <ShieldAlert className="w-4 h-4 text-emerald-600" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900">{selectedUser.role?.replace('_', ' ')} Access</span>
-                     </div>
-                  </div>
-
-                  <div className="space-y-6 pt-10 border-t border-gray-100">
-                     <h4 className="text-[10px] font-black text-emerald-900/40 uppercase tracking-widest text-center px-4 leading-none">Recalibrate Access Tier</h4>
-                     <div className="grid grid-cols-1 gap-3">
-                        {Object.values(ROLES).map((role) => (
-                          <button 
-                            key={role}
-                            onClick={() => handleRoleChange(selectedUser.id, role)}
-                            className={`flex items-center justify-between p-5 rounded-3xl border transition-all ${
-                              selectedUser.role === role 
-                              ? 'bg-emerald-950 border-emerald-950 text-white shadow-xl scale-105' 
-                              : 'bg-white border-gray-100 text-gray-400 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center gap-4">
-                               <div className={`p-2 rounded-xl ${selectedUser.role === role ? 'bg-gold-400/20 text-gold-400' : 'bg-gray-50 text-gray-400'}`}>
-                                  {role === ROLES.SUPER_ADMIN ? <ShieldCheck className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
-                               </div>
-                               <span className="text-[10px] font-black uppercase tracking-widest">{role.replace('_', ' ')}</span>
-                            </div>
-                            {selectedUser.role === role && <Zap className="w-3 h-3 text-gold-400 fill-gold-400" />}
-                          </button>
-                        ))}
-                     </div>
-                  </div>
-
-                  <div className="pt-10 border-t border-gray-100 space-y-4 text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] text-center leading-relaxed italic">
-                    All access modifications are recorded<br/>in the global audit cloud.
-                  </div>
-               </motion.div>
-             ) : (
-               <div className="bg-emerald-50/30 border-2 border-dashed border-emerald-100/50 rounded-[4rem] p-12 text-center space-y-6">
-                  <div className="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-xl border border-emerald-100">
-                     <Users className="w-8 h-8 text-emerald-900" />
-                  </div>
-                  <h3 className="text-xl font-serif font-black text-emerald-950 uppercase italic pr-4">Intelligence Vault Ready</h3>
-                  <p className="text-[10px] text-emerald-950/40 font-bold uppercase tracking-widest leading-relaxed">Select an agent from the grid to recalibrate clearing codes and system roles.</p>
+         <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white rounded-[3rem] border border-black/5 shadow-xl overflow-hidden flex flex-col h-fit">
+               <div className="p-8 border-b border-black/5 bg-zinc-50">
+                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Digital Roster</h3>
                </div>
+               <div className="max-h-[600px] overflow-y-auto no-scrollbar">
+                 {filteredUsers.map((user) => (
+                   <button key={user.id} onClick={() => setSelectedUser(user)} className={`w-full flex items-center gap-5 p-6 border-b border-black/5 transition-all text-left group ${selectedUser?.id === user.id ? 'bg-zinc-950 text-white' : 'hover:bg-zinc-50 text-zinc-950'}`}>
+                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xs ${selectedUser?.id === user.id ? 'bg-white text-zinc-950' : 'bg-zinc-100 text-zinc-400'}`}>
+                        {user.name?.[0] || user.email?.[0]?.toUpperCase()}
+                     </div>
+                     <div className="flex-1">
+                        <span className="text-[10px] font-black uppercase tracking-tight truncate block">{user.name || 'Anonymous Operative'}</span>
+                        <span className={`text-[8px] font-black uppercase tracking-widest ${selectedUser?.id === user.id ? 'text-white/40' : 'text-zinc-300'}`}>{user.role?.replace('_', ' ')}</span>
+                     </div>
+                   </button>
+                 ))}
+               </div>
+            </div>
+            <div className="bg-white border border-black/5 rounded-[2.5rem] p-10 text-zinc-950 space-y-6 relative overflow-hidden group shadow-xl">
+               <h4 className="text-zinc-300 text-[9px] font-black uppercase tracking-[0.3em]">Operational Status</h4>
+               <p className="font-black text-2xl pr-8 uppercase tracking-tighter leading-none">Encryption layers synched with <span className="text-zinc-300">Vortex-Core</span>.</p>
+            </div>
+         </div>
+
+         <div className="lg:col-span-8">
+            <AnimatePresence mode="wait">
+              {selectedUser ? (
+                <motion.div key={selectedUser.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                    <div className="bg-white rounded-[4rem] border border-black/5 shadow-2xl p-10 flex flex-col md:flex-row items-center gap-10">
+                       <div className="w-28 h-28 rounded-[2.5rem] bg-zinc-950 flex items-center justify-center text-4xl font-black text-white shadow-2xl transition-transform group-hover:scale-105">
+                          {selectedUser.name?.[0] || selectedUser.email?.[0]?.toUpperCase()}
+                       </div>
+                       <div className="flex-1 text-center md:text-left">
+                          <h2 className="text-3xl font-black text-zinc-950 tracking-tighter uppercase leading-none">{selectedUser.name || 'Personnel Profile'}</h2>
+                          <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-3">{selectedUser.email}</p>
+                          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-8">
+                             <div className="px-5 py-2.5 bg-zinc-950 text-white rounded-full flex items-center gap-3 shadow-xl">
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em]">{selectedUser.role?.replace('_', ' ')}</span>
+                             </div>
+                             <button onClick={() => resetPermissions(selectedUser.id)} className="px-5 py-2.5 bg-zinc-50 border border-black/5 text-zinc-400 hover:text-zinc-950 hover:bg-zinc-100 rounded-full flex items-center gap-3 transition-all">
+                                <RotateCcw className="w-3.5 h-3.5" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Reset</span>
+                             </button>
+                          </div>
+                       </div>
+                    </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {permissionGroups.map((group, gIdx) => (
+                        <div key={gIdx} className="bg-white rounded-[3rem] border border-black/5 shadow-xl overflow-hidden flex flex-col">
+                           <div className="p-8 bg-zinc-50 border-b border-black/5 flex items-center gap-4">
+                              <group.icon className="w-4 h-4 text-zinc-950" />
+                              <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">{group.name}</h4>
+                           </div>
+                           <div className="p-6 space-y-4">
+                               {group.perms.map((perm, pIdx) => {
+                                  const isPermitted = hasPermission(selectedUser, perm.key);
+                                  return (
+                                    <div key={pIdx} className={`p-6 rounded-[2rem] border transition-all flex items-center justify-between ${isPermitted ? 'bg-white border-black/5 shadow-sm' : 'bg-zinc-50/50 border-black/5 opacity-40'}`}>
+                                       <div className="flex-1">
+                                          <span className={`text-[10px] font-black uppercase tracking-tight block ${isPermitted ? 'text-zinc-950' : 'text-zinc-300'}`}>{perm.label}</span>
+                                          <p className="text-[8px] font-black text-zinc-300 uppercase tracking-widest mt-2">{perm.desc}</p>
+                                       </div>
+                                       <button onClick={() => togglePermission(selectedUser.id, perm.key)} className={`w-14 h-8 rounded-full relative transition-all duration-300 ${isPermitted ? 'bg-zinc-950' : 'bg-zinc-200'}`}>
+                                          <div className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 ${isPermitted ? 'right-1 bg-white' : 'left-1 bg-white'}`} />
+                                       </button>
+                                    </div>
+                                  );
+                               })}
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+
+                    <div className="bg-white rounded-[3.5rem] border border-black/5 shadow-2xl p-10">
+                       <h4 className="text-xl font-black text-zinc-950 uppercase tracking-tighter mb-10">Recalibrate Access Tier</h4>
+                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                          {Object.values(ROLES).filter(r => r !== 'banned').map((role) => (
+                             <button key={role} onClick={() => handleRoleChange(selectedUser.id, role)} className={`p-8 rounded-[2rem] border transition-all flex flex-col gap-3 group ${selectedUser.role === role ? 'bg-zinc-950 border-zinc-950 text-white shadow-2xl scale-105' : 'bg-zinc-50 border-black/5 text-zinc-300 hover:bg-white hover:text-zinc-950 hover:border-black/5 transition-all'}`}>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">{role.replace('_', ' ')}</span>
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                </motion.div>
+             ) : (
+                 <div className="bg-white border border-black/5 rounded-[5rem] p-40 text-center shadow-xl">
+                    <h3 className="text-3xl font-black text-zinc-950 uppercase tracking-tighter mb-3">Personnel Required</h3>
+                    <p className="text-[10px] text-zinc-300 font-black uppercase tracking-[0.2em] max-w-xs mx-auto leading-relaxed">Select an operative from the digital roster to begin system recalibration.</p>
+                 </div>
              )}
            </AnimatePresence>
         </div>

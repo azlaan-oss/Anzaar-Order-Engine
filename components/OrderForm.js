@@ -175,6 +175,8 @@ export default function OrderForm({ onSuccess }) {
 
   const addItemToStage = () => {
     if (!selectedProduct || !selectedVariant) return toast.error("Select product and color first");
+    if (selectedProduct.isStockOut) return toast.error("This product is currently Stock Out");
+    if (selectedVariant.isStockOut) return toast.error("This color variation is currently Stock Out");
     if (!selectedSize) return toast.error("Select a size first");
 
     let extraCharge = 0;
@@ -209,7 +211,7 @@ export default function OrderForm({ onSuccess }) {
     
     setStagedItems([...stagedItems, newItem]);
     
-    // Reset Selection After Staging
+    // Reset Selection After Adding
     setSelectedVariantId('');
     setSelectedSize('');
     setCustomMeasures({ long: '', body: '', sleeve: '', shoulder: '' });
@@ -219,7 +221,7 @@ export default function OrderForm({ onSuccess }) {
     if (stagedItems.length === 0) return;
     setOrder({ ...order, items: [...order.items, ...stagedItems] });
     setStagedItems([]);
-    toast.success(`${stagedItems.length} products added to order architecture!`);
+    toast.success(`${stagedItems.length} products added to order!`);
   };
 
   const removeItem = (id, isStage = false) => {
@@ -314,21 +316,33 @@ export default function OrderForm({ onSuccess }) {
       const firebaseDocId = await createOrder({ ...orderData, id: customOrderId });
 
       // 4. Trigger Google Sheets Sync (Backgrounded for speed)
-      fetch('/api/sync-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+      const finalOrderData = { 
           ...orderData, 
           orderId: customOrderId,
           sheetId: settings?.activeSheetId,
           sheetTab: settings?.activeSheetTab || 'Sheet1'
-        })
+      };
+
+      fetch('/api/sync-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(finalOrderData)
       }).then(async res => {
+        const data = await res.json();
         if (!res.ok) {
-           const errData = await res.json();
-           toast.warning(`Sheets Sync Pending: ${errData.error}`, { duration: 5000 });
+           toast.warning(`Sync Alert: ${data.error || 'Connection unstable'}`, { 
+             description: "The order is saved in the vault, but the Google Sheet update is pending.",
+             duration: 6000 
+           });
+        } else {
+           console.log("Protocol Sync Successful:", data.message);
         }
-      }).catch(err => console.error("Sheets Background Sync Failed:", err));
+      }).catch(err => {
+        console.error("Sheets Background Sync Failed:", err);
+        toast.error("Cloud Sync Protocol Interrupted", {
+          description: "System will retry in the next cycle."
+        });
+      });
 
        toast.dismiss(toastId);
        toast.success(`Order #${customOrderId} placed successfully!`);
@@ -361,20 +375,20 @@ export default function OrderForm({ onSuccess }) {
       autoComplete="off"
       onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }} 
       onKeyDown={(e) => { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault(); }}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20"
+      className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 mb-32 px-4 md:px-0"
     >
       
       {/* Left Column: Customer & Selection */}
       <div className="space-y-8">
         
         {/* Section: Customer Info */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+        <section className="glass-panel p-6 rounded-[2.5rem] space-y-6">
            <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
-                <div className="bg-emerald-50 p-2 rounded-lg text-emerald-900">
+                <div className="bg-zinc-950/5 p-2 rounded-lg text-zinc-950">
                   <User className="w-5 h-5" />
                 </div>
-                <h3 className="font-serif font-bold text-lg text-gray-900">Customer Intelligence</h3>
+                <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Customer Pulse</h3>
               </div>
               
               <AnimatePresence>
@@ -382,11 +396,11 @@ export default function OrderForm({ onSuccess }) {
                   <motion.div 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                      customerIntel.reputation === 'Premium' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                      customerIntel.reputation === 'Caution' ? 'bg-red-50 text-red-600 border-red-200' :
-                      customerIntel.reputation === 'Trusted' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                      'bg-gray-50 text-gray-400 border-gray-200'
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
+                      customerIntel.reputation === 'Premium' ? 'bg-zinc-950 text-white border-zinc-950 shadow-lg' :
+                      customerIntel.reputation === 'Caution' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                      customerIntel.reputation === 'Trusted' ? 'bg-zinc-950/10 text-zinc-950 border-black/5' :
+                      'bg-black/5 text-zinc-400 border-black/5'
                     }`}
                   >
                      {customerIntel.reputation === 'Premium' && <Award className="w-3 h-3" />}
@@ -402,10 +416,10 @@ export default function OrderForm({ onSuccess }) {
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-emerald-950 p-4 rounded-2xl flex items-center justify-between text-white"
+              className="bg-white/40 backdrop-blur-3xl p-4 rounded-3xl flex items-center justify-between text-zinc-950 border border-black/5"
             >
                <div className="space-y-1">
-                  <p className="text-[8px] font-bold text-emerald-400 uppercase tracking-widest">Lifetime Pulse</p>
+                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Lifetime Pulse</p>
                   <p className="text-sm font-black tracking-tight">৳ {customerIntel.totalSpent.toLocaleString()}</p>
                </div>
                <div className="flex items-center gap-4 text-center border-l border-white/10 pl-4">
@@ -415,7 +429,7 @@ export default function OrderForm({ onSuccess }) {
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-white/40 uppercase">Success</p>
-                    <p className="text-xs font-bold text-emerald-400">{customerIntel.successful}</p>
+                    <p className="text-xs font-bold text-zinc-400">{customerIntel.successful}</p>
                   </div>
                   <div>
                     <p className="text-[8px] font-black text-white/40 uppercase">Active</p>
@@ -429,74 +443,76 @@ export default function OrderForm({ onSuccess }) {
             </motion.div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Name</label>
-              <div className="relative">
-                <input 
-                  type="text" required
-                  autoFocus
-                  value={order.customer.name}
-                  onChange={e => setOrder({...order, customer: {...order.customer, name: e.target.value}})}
-                  className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10" 
-                  placeholder="Enter full name"
-                />
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-              </div>
-            </div>
+               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Identified Name</label>
+               <div className="relative">
+                 <input 
+                   type="text" required
+                   autoFocus
+                   value={order.customer.name}
+                   onChange={e => setOrder({...order, customer: {...order.customer, name: e.target.value}})}
+                   className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
+                   placeholder="ENTER FULL IDENTITY"
+                 />
+                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
+               </div>
+             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Phone</label>
+              <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Protocol Phone</label>
               <div className="relative group">
                 <input 
                   type="tel" required
                   value={order.customer.phone}
                   onChange={e => setOrder({...order, customer: {...order.customer, phone: e.target.value}})}
-                  className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10" 
+                  className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
                   placeholder="01XXXXXXXXX"
                 />
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
               </div>
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Address</label>
+            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Sector Vector (Address)</label>
             <div className="relative">
               <textarea 
                 required
                 value={order.customer.address}
                 onChange={e => setOrder({...order, customer: {...order.customer, address: e.target.value}})}
                 rows="2"
-                className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none pl-10" 
-                placeholder="Village/Road, House, Area, City"
+                className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
+                placeholder="VILLAGE/ROAD, HOUSE, AREA, CITY"
               />
-              <MapPin className="absolute left-3 top-4 w-4 h-4 text-gray-300" />
+              <MapPin className="absolute left-4 top-5 w-4 h-4 text-zinc-300" />
             </div>
-            <div className="space-y-1 col-span-full">
-              <label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest pl-1">Special Notes</label>
-              <textarea 
-                value={order.customer.notes}
-                onChange={e => setOrder({...order, customer: {...order.customer, notes: e.target.value}})}
-                rows="1"
-                className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none" 
-                placeholder="Any special instructions for the rider or packing..."
-              />
-            </div>
+          </div>
+
+          <div className="space-y-1 col-span-full">
+               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Special Order Directive</label>
+               <textarea 
+                 value={order.customer.notes}
+                 onChange={e => setOrder({...order, customer: {...order.customer, notes: e.target.value}})}
+                 rows="2"
+                 className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none font-black placeholder:text-zinc-300" 
+                 placeholder="ANY SPECIAL INSTRUCTIONS..."
+               />
+             </div>
 
             <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between p-3 bg-red-50/50 rounded-2xl border border-red-100/50">
-                <div className="flex items-center gap-2 text-red-700">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Urgent Priority?</span>
-                </div>
-                <div 
-                  onClick={() => setOrder({...order, isUrgent: !order.isUrgent})}
-                  className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-300 ${order.isUrgent ? 'bg-red-500' : 'bg-gray-200'}`}
-                >
+              <div className="flex items-center justify-between p-4 bg-black/5 rounded-[2rem] border border-black/5">
+                 <div className="flex items-center gap-3 text-red-500">
+                     <AlertCircle className="w-5 h-5" />
+                     <span className="text-[10px] font-black uppercase tracking-widest">Urgent Priority?</span>
+                 </div>
+                 <div 
+                   onClick={() => setOrder({...order, isUrgent: !order.isUrgent})}
+                   className={`w-14 h-8 rounded-full p-1.5 cursor-pointer transition-colors duration-300 ${order.isUrgent ? 'bg-red-500 shadow-lg shadow-red-500/30' : 'bg-black/10 shadow-inner'}`}
+                 >
                   <motion.div 
                     animate={{ x: order.isUrgent ? 24 : 0 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className="w-4 h-4 bg-white rounded-full shadow-sm"
+                    className="w-5 h-5 bg-white rounded-full shadow-md"
                   />
                 </div>
               </div>
@@ -514,46 +530,45 @@ export default function OrderForm({ onSuccess }) {
                           <CalendarDays className="w-3 h-3" /> Delivery Deadline Date
                         </label>
                         <input 
-                          type="date"
-                          required={order.isUrgent}
-                          value={order.urgentDate}
-                          onChange={e => setOrder({...order, urgentDate: e.target.value})}
-                          className="w-full bg-gray-50 text-emerald-950 font-bold border border-gray-100 p-3 rounded-xl focus:ring-2 focus:ring-red-500/10 focus:outline-none"
-                        />
+                           type="date"
+                           required={order.isUrgent}
+                           value={order.urgentDate}
+                           onChange={e => setOrder({...order, urgentDate: e.target.value})}
+                           className="w-full bg-white text-zinc-950 font-black border border-black/5 p-3 rounded-xl focus:ring-2 focus:ring-red-500/10 focus:outline-none"
+                         />
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-          </div>
         </section>
 
         {/* Section: Product Smart Selector */}
-        <section className={`bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-          <div className="flex items-center gap-2 mb-2">
-             <div className="bg-gold-50 p-2 rounded-lg text-gold-600">
-               <ShoppingBag className="w-5 h-5" />
-             </div>
-             <h3 className="font-serif font-bold text-lg text-gray-900">Add Products</h3>
-          </div>
+        <section className={`glass-panel p-6 rounded-[2.5rem] space-y-6 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+           <div className="flex items-center gap-2 mb-2">
+              <div className="bg-zinc-950/5 p-2 rounded-lg text-zinc-950">
+                <ShoppingBag className="w-5 h-5" />
+              </div>
+              <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Vortex Selection</h3>
+           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" ref={searchRef}>
             <div className="relative group">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-900 transition-colors">
-                <Search className="w-4 h-4" />
-              </div>
-              <input 
-                type="text"
-                placeholder="Smart Search Product..."
-                value={productSearch || (selectedProduct?.name || '')}
-                onChange={(e) => {
-                  setProductSearch(e.target.value);
-                  setIsProductListOpen(true);
-                  if (e.target.value === '') setSelectedProductId('');
-                }}
-                onFocus={() => setIsProductListOpen(true)}
-                className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 pl-10 rounded-xl focus:ring-2 focus:ring-emerald-900/5 focus:outline-none placeholder:text-gray-300"
-              />
+               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-zinc-950 transition-colors">
+                 <Search className="w-4 h-4" />
+               </div>
+               <input 
+                 type="text"
+                 placeholder="SCAN MASTER INVENTORY..."
+                 value={productSearch || (selectedProduct?.name || '')}
+                 onChange={(e) => {
+                   setProductSearch(e.target.value);
+                   setIsProductListOpen(true);
+                   if (e.target.value === '') setSelectedProductId('');
+                 }}
+                 onFocus={() => setIsProductListOpen(true)}
+                 className="w-full bg-white text-zinc-950 border border-black/5 p-4 pl-12 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none placeholder:text-zinc-300 font-black tracking-widest uppercase"
+               />
               
               <AnimatePresence>
                 {isProductListOpen && (
@@ -561,33 +576,35 @@ export default function OrderForm({ onSuccess }) {
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto overflow-x-hidden custom-scrollbar"
+                    className="absolute left-0 right-0 top-full mt-4 bg-white border border-black/5 rounded-[2rem] shadow-2xl z-50 max-h-80 overflow-y-auto overflow-x-hidden custom-scrollbar"
                   >
                     {products.filter(p => 
+                      !p.isStockOut && 
                       p.name.toLowerCase().includes(productSearch.toLowerCase())
                     ).length === 0 ? (
-                      <div className="p-4 text-center text-xs text-gray-400 italic">No products found</div>
+                      <div className="p-8 text-center text-[10px] font-black text-zinc-300 uppercase tracking-widest">No matching assets identified</div>
                     ) : (
                       products.filter(p => 
+                        !p.isStockOut &&
                         p.name.toLowerCase().includes(productSearch.toLowerCase())
                       ).map(p => (
-                        <div 
-                          key={p.id}
-                          onClick={() => {
-                            setSelectedProductId(p.id);
-                            setSelectedVariantId('0'); // Auto-select first variant
-                            setSelectedSize('52(S)');  // Auto-select first size
-                            setProductSearch('');
-                            setIsProductListOpen(false);
-                          }}
-                          className="p-4 hover:bg-emerald-50 cursor-pointer flex items-center justify-between border-b border-gray-50 last:border-0"
-                        >
-                           <div>
-                             <p className="text-xs font-bold text-emerald-950 uppercase">{p.name}</p>
-                             <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{p.category || 'Luxury'}</p>
-                           </div>
-                           <span className="text-[10px] font-black text-emerald-900">৳{p.basePrice}</span>
-                        </div>
+                         <div 
+                           key={p.id}
+                           onClick={() => {
+                             setSelectedProductId(p.id);
+                             setSelectedVariantId('0'); // Auto-select first variant
+                             setSelectedSize('52/42/21 (S)');  // Auto-select first size
+                             setProductSearch('');
+                             setIsProductListOpen(false);
+                           }}
+                           className="p-5 hover:bg-black/5 cursor-pointer flex items-center justify-between border-b border-black/5 last:border-0 transition-colors"
+                         >
+                            <div>
+                              <p className="text-xs font-black text-zinc-950 uppercase tracking-tight">{p.name}</p>
+                              <p className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">{p.category || 'Luxury Masterpiece'}</p>
+                            </div>
+                            <span className="text-[10px] font-black text-zinc-950 tracking-tighter">৳{p.basePrice?.toLocaleString()}</span>
+                         </div>
                       ))
                     )}
                   </motion.div>
@@ -599,10 +616,17 @@ export default function OrderForm({ onSuccess }) {
               value={selectedVariantId}
               disabled={!selectedProductId}
               onChange={e => setSelectedVariantId(e.target.value)}
-              className="w-full bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none disabled:opacity-50"
+              className="w-full bg-white text-zinc-950 font-black border border-black/5 p-3 rounded-xl focus:outline-none disabled:opacity-20"
              >
                 {selectedProduct?.variants.map((v, idx) => (
-                  <option key={idx} value={idx}>{v.color}</option>
+                  <option 
+                    key={idx} 
+                    value={idx}
+                    disabled={v.isStockOut}
+                    className={v.isStockOut ? 'text-zinc-300' : ''}
+                  >
+                    {v.color} {v.isStockOut ? '(Stock Out)' : ''}
+                  </option>
                 ))}
              </select>
 
@@ -610,42 +634,42 @@ export default function OrderForm({ onSuccess }) {
               value={selectedSize}
               disabled={!selectedVariantId}
               onChange={e => setSelectedSize(e.target.value)}
-              className="w-full md:col-span-2 bg-gray-50 text-gray-900 border border-gray-100 p-3 rounded-xl focus:outline-none disabled:opacity-50"
+              className="w-full md:col-span-2 bg-white text-zinc-950 font-black border border-black/5 p-4 rounded-2xl focus:outline-none disabled:opacity-20 appearance-none"
              >
-                <option value="52(S)">52 (S)</option>
-                <option value="54(M)">54 (M)</option>
-                <option value="56(L)">56 (L)</option>
-                <option value="Customize">Customize Size</option>
+                 <option value="52/42/21 (S)">52/42/21 (S)</option>
+                 <option value="54/44/22 (M)">54/44/22 (M)</option>
+                 <option value="56/46/23 (L)">56/46/23 (L)</option>
+                 <option value="Customize">Customize Size</option>
              </select>
           </div>
 
           <AnimatePresence>
             {selectedSize === 'Customize' && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="grid grid-cols-4 gap-2 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100"
-              >
+               <motion.div 
+                 initial={{ opacity: 0, height: 0 }}
+                 animate={{ opacity: 1, height: 'auto' }}
+                 exit={{ opacity: 0, height: 0 }}
+                 className="grid grid-cols-4 gap-2 bg-black/5 p-4 rounded-xl border border-black/5"
+               >
                  <div className="space-y-1">
-                   <label className="text-[10px] font-bold text-gray-500 uppercase">Long</label>
-                   <input type="number" placeholder='e.g. 56' value={customMeasures.long} onChange={e => setCustomMeasures({...customMeasures, long: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
-                 </div>
-                 <div className="space-y-1">
-                   <label className="text-[10px] font-bold text-gray-500 uppercase">Body</label>
-                   <input type="number" placeholder='Max 58' value={customMeasures.body} onChange={e => setCustomMeasures({...customMeasures, body: e.target.value})} className={`w-full p-2 text-xs rounded-lg border ${parseInt(customMeasures.body) > 58 ? 'border-red-400 focus:ring-red-400' : 'border-emerald-200'} focus:outline-none`}/>
-                 </div>
-                 <div className="space-y-1">
-                   <label className="text-[10px] font-bold text-gray-500 uppercase">Sleeve</label>
-                   <input type="number" placeholder='e.g. 22' value={customMeasures.sleeve} onChange={e => setCustomMeasures({...customMeasures, sleeve: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
-                 </div>
-                 <div className="space-y-1">
-                   <label className="text-[10px] font-bold text-gray-500 uppercase">Shoulder</label>
-                   <input type="number" placeholder='e.g. 15' value={customMeasures.shoulder} onChange={e => setCustomMeasures({...customMeasures, shoulder: e.target.value})} className="w-full p-2 text-xs rounded-lg border-emerald-200 border focus:outline-none"/>
-                 </div>
-                 <div className="col-span-4 text-[10px] text-emerald-700 font-medium">
-                   *Long &gt; 58 = +250 ৳ | Long &gt; 62 = +450 ৳ | Body &gt; 48 = +250 ৳ | Body limit: 58
-                 </div>
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Long</label>
+                    <input type="number" placeholder='56' value={customMeasures.long} onChange={e => setCustomMeasures({...customMeasures, long: e.target.value})} className="w-full p-2 text-xs rounded-lg border-black/5 bg-white text-zinc-950 focus:outline-none font-bold"/>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Body</label>
+                    <input type="number" placeholder='58' value={customMeasures.body} onChange={e => setCustomMeasures({...customMeasures, body: e.target.value})} className={`w-full p-2 text-xs rounded-lg bg-white text-zinc-950 border ${parseInt(customMeasures.body) > 58 ? 'border-red-400' : 'border-black/5'} focus:outline-none font-bold`}/>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Sleeve</label>
+                    <input type="number" placeholder='22' value={customMeasures.sleeve} onChange={e => setCustomMeasures({...customMeasures, sleeve: e.target.value})} className="w-full p-2 text-xs rounded-lg border-black/5 bg-white text-zinc-950 focus:outline-none font-bold"/>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Shoulder</label>
+                    <input type="number" placeholder='15' value={customMeasures.shoulder} onChange={e => setCustomMeasures({...customMeasures, shoulder: e.target.value})} className="w-full p-2 text-xs rounded-lg border-black/5 bg-white text-zinc-950 focus:outline-none font-bold"/>
+                  </div>
+                  <div className="col-span-4 text-[9px] text-zinc-400 font-black uppercase tracking-widest">
+                    *Long &gt; 58 = +250 ৳ | Long &gt; 62 = +450 ৳ | Body &gt; 48 = +250 ৳
+                  </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -655,25 +679,25 @@ export default function OrderForm({ onSuccess }) {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-4 bg-gray-50/80 p-5 rounded-[2rem] border border-gray-100 shadow-sm"
+                className="flex items-center gap-4 bg-white/40 backdrop-blur-3xl p-5 rounded-[2.5rem] border border-black/5 shadow-sm"
               >
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-gray-100 shadow-inner">
-                   <img src={selectedVariant.imageUrl} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1">
-                   <h4 className="font-serif font-black text-emerald-950 text-base leading-tight">{selectedProduct.name}</h4>
-                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-1">
-                     {selectedVariant.color} • SKU: {selectedVariant.sku}
-                   </p>
-                   <p className="text-xl font-black text-emerald-900 mt-1">৳ {selectedProduct.basePrice + (selectedSize === 'Customize' ? 0 : 0)}</p>
-                </div>
-                <button 
-                  type="button"
-                  onClick={addItemToStage}
-                  className="bg-emerald-900 hover:bg-emerald-950 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-900/20 active:scale-95 transition-all"
-                >
-                  Stage Product
-                </button>
+                 <div className="w-20 h-20 rounded-2xl overflow-hidden border border-black/5 shadow-inner">
+                    <img src={selectedVariant.imageUrl} className="w-full h-full object-cover" />
+                 </div>
+                 <div className="flex-1">
+                    <h4 className="font-black text-zinc-950 text-base leading-tight uppercase tracking-tighter">{selectedProduct.name}</h4>
+                    <p className="text-[9px] text-zinc-400 font-black uppercase tracking-widest mt-1">
+                      {selectedVariant.color} • SKU: {selectedVariant.sku}
+                    </p>
+                    <p className="text-xl font-black text-zinc-950 mt-1 uppercase tracking-tighter">৳ {selectedProduct.basePrice}</p>
+                 </div>
+                 <button 
+                   type="button"
+                   onClick={addItemToStage}
+                   className="bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                 >
+                   Deploy Stage
+                 </button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -682,32 +706,32 @@ export default function OrderForm({ onSuccess }) {
           <AnimatePresence>
             {stagedItems.length > 0 && (
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-emerald-50 rounded-3xl p-5 border border-emerald-100 space-y-4"
-              >
-                <div className="flex justify-between items-center text-emerald-900 font-black text-[10px] uppercase tracking-widest">
-                  <span>Product Queue ({stagedItems.length})</span>
-                  <button type="button" onClick={confirmStagedToOrder} className="bg-emerald-900 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-800 transition-colors">
-                    Add All to Order
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {stagedItems.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-xl flex items-center justify-between shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <img src={item.image} className="w-8 h-8 rounded-lg object-cover" />
-                        <div>
-                          <p className="text-[10px] font-black text-emerald-950">{item.name}</p>
-                          <p className="text-[8px] text-gray-400 font-bold uppercase">{item.color} • {item.size}</p>
-                        </div>
-                      </div>
-                      <button type="button" onClick={() => removeItem(item.id, true)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 className="bg-black/5 rounded-3xl p-5 border border-black/5 space-y-4"
+               >
+                 <div className="flex justify-between items-center text-zinc-950 font-black text-[10px] uppercase tracking-[0.2em]">
+                   <span>Pipeline ({stagedItems.length})</span>
+                   <button type="button" onClick={confirmStagedToOrder} className="bg-zinc-950 text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors font-black text-[9px]">
+                     PROCESS QUEUE
+                   </button>
+                 </div>
+                 <div className="space-y-2">
+                   {stagedItems.map(item => (
+                     <div key={item.id} className="bg-white p-3 rounded-xl flex items-center justify-between border border-black/5 shadow-sm">
+                       <div className="flex items-center gap-3">
+                         <img src={item.image} className="w-8 h-8 rounded-lg object-cover ring-1 ring-black/5" />
+                         <div>
+                           <p className="text-[10px] font-black text-zinc-950 uppercase">{item.name}</p>
+                           <p className="text-[8px] text-zinc-400 font-black uppercase">{item.color} • {item.size}</p>
+                         </div>
+                       </div>
+                       <button type="button" onClick={() => removeItem(item.id, true)} className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg">
+                         <X className="w-3.5 h-3.5" />
+                       </button>
+                     </div>
+                   ))}
+                 </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -719,30 +743,30 @@ export default function OrderForm({ onSuccess }) {
       <div className="space-y-8">
         
         {/* Section: Checkout Summary */}
-        <section className="bg-emerald-950 p-8 rounded-[40px] text-white shadow-2xl space-y-6 relative overflow-hidden">
-          {/* Decorative element */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/10 rounded-full blur-3xl -mr-10 -mt-10" />
-          
-          <h3 className="font-serif font-bold text-xl flex items-center gap-2">
-            <ShoppingBag className="w-6 h-6 text-gold-400" />
-            Order Architecture
-          </h3>
+        <section className="bg-white/40 backdrop-blur-3xl p-8 rounded-[40px] text-zinc-950 shadow-2xl space-y-6 relative overflow-hidden border border-black/5">
+           {/* Decorative element */}
+           <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 rounded-full blur-3xl -mr-10 -mt-10" />
+           
+           <h3 className="font-black text-xl flex items-center gap-2 uppercase tracking-tighter text-zinc-950">
+             <ShoppingBag className="w-6 h-6 text-zinc-400" />
+             Order Architecture
+           </h3>
 
           <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
             {order.items.length === 0 ? (
-              <div className="py-10 text-center opacity-30 italic text-sm">No items added yet.</div>
+              <div className="py-10 text-center opacity-30 text-sm">No items added yet.</div>
             ) : order.items.map((item) => (
               <div key={item.id} className="flex items-center justify-between group">
                 <div className="flex items-center gap-3">
-                   <img src={item.image} className="w-10 h-10 rounded-lg object-cover ring-1 ring-white/20" />
-                   <div>
-                     <p className="text-sm font-bold leading-tight">{item.name}</p>
-                     <p className="text-[10px] text-gold-400 font-bold uppercase tracking-widest">{item.color} • {item.size}</p>
-                     {item.extraCharge > 0 && <p className="text-[10px] text-emerald-400 font-bold">+ ৳ {item.extraCharge} Size Surcharge</p>}
-                   </div>
-                </div>
-                <div className="text-right flex items-center gap-4">
-                   <p className="font-bold text-gold-400">৳ {item.price}</p>
+                    <img src={item.image} className="w-10 h-10 rounded-lg object-cover ring-1 ring-white/10" />
+                    <div>
+                      <p className="text-sm font-black leading-tight uppercase tracking-tight">{item.name}</p>
+                      <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">{item.color} • {item.size}</p>
+                      {item.extraCharge > 0 && <p className="text-[10px] text-white/20 font-black">+ ৳ {item.extraCharge} Surcharge</p>}
+                    </div>
+                 </div>
+                 <div className="text-right flex items-center gap-4">
+                    <p className="font-black text-white tracking-tighter">৳ {item.price}</p>
                    <button 
                     type="button"
                     onClick={() => removeItem(item.id)}
@@ -761,23 +785,23 @@ export default function OrderForm({ onSuccess }) {
           {/* Logic Grid */}
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-               <label className="text-[10px] font-bold text-white/40 uppercase pl-1">Delivery Zone</label>
-               <select 
-                value={order.delivery.type}
-                onChange={e => {
-                  const type = e.target.value;
-                  const charge = settings?.deliveryRates?.[type] || (type === 'inside' ? 80 : 150);
-                  setOrder({...order, delivery: { type, charge }});
-                }}
-                className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm focus:outline-none"
-               >
-                 <option value="inside">Inside Dhaka (৳{settings?.deliveryRates?.inside || 80})</option>
-                 <option value="outside">Outside Dhaka (৳{settings?.deliveryRates?.outside || 150})</option>
-               </select>
-             </div>
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Delivery Protocol</label>
+                <select 
+                 value={order.delivery.type}
+                 onChange={e => {
+                   const type = e.target.value;
+                   const charge = settings?.deliveryRates?.[type] || (type === 'inside' ? 80 : 150);
+                   setOrder({...order, delivery: { type, charge }});
+                 }}
+                 className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-black uppercase focus:outline-none"
+                >
+                  <option value="inside">Dhaka Matrix (৳{settings?.deliveryRates?.inside || 80})</option>
+                  <option value="outside">External Matrix (৳{settings?.deliveryRates?.outside || 150})</option>
+                </select>
+              </div>
 
              <div className="space-y-2">
-               <label className="text-[10px] font-bold text-white/40 uppercase pl-1">Campaign Discount</label>
+               <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Active Campaign</label>
                <select 
                 value={order.discount.percentage}
                 onChange={e => {
@@ -788,47 +812,49 @@ export default function OrderForm({ onSuccess }) {
                     setOrder({...order, discount: { campaign: e.target.options[e.target.selectedIndex].text, percentage: pct }});
                   }
                 }}
-                className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-sm focus:outline-none"
+                className="w-full bg-white text-zinc-950 border border-black/5 p-2 rounded-xl text-sm focus:outline-none"
                >
                  <option value="0">No Campaign</option>
                  {settings?.campaigns.map((camp, idx) => (
-                   <option key={idx} value={camp.percentage}>{camp.name} ({camp.percentage}%)</option>
+                   <option key={idx} value={camp.percentage} className="text-zinc-950">{camp.name} ({camp.percentage}%)</option>
                  ))}
-                 <option value="special">Special Permission</option>
+                 <option value="special" className="text-zinc-950">Special Permission</option>
                </select>
              </div>
           </div>
 
            {order.discount.campaign.includes("Special") && (
-             <motion.div initial={{opacity:0, y:5}} animate={{opacity:1, y:0}} className="mt-4 p-3 bg-gold-400/10 rounded-xl border border-gold-400/20 space-y-2">
-                <div className="flex items-center gap-2 text-gold-400">
-                   <AlertTriangle className="w-3 h-3" />
-                   <div className="text-[9px] font-black uppercase tracking-widest">Auth Required</div>
+             <motion.div initial={{opacity:0, y:5}} animate={{opacity:1, y:0}} className="mt-4 p-4 bg-black/5 rounded-2xl border border-black/5 space-y-3">
+                <div className="flex items-center gap-2 text-zinc-950">
+                   <AlertTriangle className="w-3 h-3 text-red-500" />
+                   <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Authentication Required</div>
                 </div>
                 <input 
                   type="number"
                   placeholder="Manual Discount %"
                   value={order.discount.percentage}
                   onChange={e => setOrder({...order, discount: { ...order.discount, percentage: parseInt(e.target.value) || 0 }})}
-                  className="w-full bg-white/10 border border-white/10 p-2 rounded-lg text-xs"
+                  className="w-full bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950"
                 />
              </motion.div>
            )}
 
           {/* Advance Payment Logic */}
-          <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+          <div className="bg-black/5 p-4 rounded-2xl border border-black/5 space-y-4">
              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-gold-400" />
-                  <span className="text-sm font-bold">Advance Payment?</span>
-                </div>
-                <input 
-                  type="checkbox" 
-                  checked={order.payment.advancePaid}
-                  onChange={e => setOrder({...order, payment: {...order.payment, advancePaid: e.target.checked}})}
-                  className="w-5 h-5 accent-gold-400"
-                />
-             </div>
+                 <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 rounded-xl bg-zinc-950 flex items-center justify-center text-white">
+                      <CreditCard className="w-4 h-4" />
+                   </div>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Advance Payment Required</span>
+                 </div>
+                 <input 
+                   type="checkbox" 
+                   checked={order.payment.advancePaid}
+                   onChange={e => setOrder({...order, payment: {...order.payment, advancePaid: e.target.checked}})}
+                   className="w-6 h-6 rounded-lg accent-zinc-950 cursor-pointer shadow-sm border-black/5"
+                 />
+              </div>
 
              {order.payment.advancePaid && (
                <motion.div 
@@ -839,7 +865,7 @@ export default function OrderForm({ onSuccess }) {
                  <select 
                   value={order.payment.method}
                   onChange={e => setOrder({...order, payment: {...order.payment, method: e.target.value}})}
-                  className="bg-white/10 border border-white/10 p-2 rounded-lg text-xs"
+                  className="bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950"
                  >
                    <option value="Bkash">Bkash</option>
                    <option value="Nagad">Nagad</option>
@@ -851,14 +877,14 @@ export default function OrderForm({ onSuccess }) {
                   required
                   value={order.payment.transactionId}
                   onChange={e => setOrder({...order, payment: {...order.payment, transactionId: e.target.value}})}
-                  className="bg-white/10 border border-white/10 p-2 rounded-lg text-xs placeholder:text-white/30"
+                  className="bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950 placeholder:text-zinc-300"
                  />
                  <input 
                   type="tel" 
                   placeholder="Sender Phone"
                   value={order.payment.senderPhone || ''}
                   onChange={e => setOrder({...order, payment: {...order.payment, senderPhone: e.target.value}})}
-                  className="bg-white/10 border border-white/10 p-2 rounded-lg text-xs placeholder:text-white/30"
+                  className="bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950 placeholder:text-zinc-300"
                  />
                  <div className="col-span-full">
                     <input 
@@ -866,24 +892,24 @@ export default function OrderForm({ onSuccess }) {
                       placeholder="Advance Amount (৳)"
                       value={order.payment.amount}
                       onChange={e => setOrder({...order, payment: {...order.payment, amount: parseFloat(e.target.value) || 0}})}
-                      className="w-full bg-white/10 border border-white/10 p-2 rounded-lg text-xs"
+                      className="w-full bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950"
                     />
                  </div>
                  <div className="col-span-full space-y-2">
-                    <label className="text-[8px] font-bold text-white/40 uppercase block">Proof Photo (Compressed)</label>
+                    <label className="text-[8px] font-bold text-zinc-400 uppercase block">Proof Photo (Compressed)</label>
                     <div className="flex items-center gap-3">
-                       <label className="flex-1 bg-white/10 border border-white/10 p-2 rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-white/20 transition-all border-dashed">
-                          <ExternalLink className="w-3 h-3 text-gold-400" />
-                          <span className="text-[10px] font-bold uppercase">Upload Proof</span>
+                       <label className="flex-1 bg-white border border-black/5 border-dashed p-4 rounded-xl flex items-center justify-center gap-3 cursor-pointer hover:bg-black/5 transition-all shadow-inner">
+                          <ExternalLink className="w-4 h-4 text-zinc-300" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Upload Digital Proof</span>
                           <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
                        </label>
                        {order.payment.proofUrl && (
                          <div className="relative group">
-                            <img src={order.payment.proofUrl} className="w-10 h-10 rounded-lg border border-white/20 object-cover" />
-                            <CheckCircle2 className="absolute -top-1 -right-1 w-3 h-3 text-emerald-400 bg-emerald-950 rounded-full" />
+                            <img src={order.payment.proofUrl} className="w-10 h-10 rounded-lg border border-black/5 object-cover" />
+                            <CheckCircle2 className="absolute -top-1 -right-1 w-3 h-3 text-white bg-zinc-950 rounded-full" />
                          </div>
                        )}
-                       {uploading && <RefreshCw className="w-4 h-4 animate-spin text-gold-400" />}
+                       {uploading && <RefreshCw className="w-4 h-4 animate-spin text-zinc-950" />}
                     </div>
                  </div>
                </motion.div>
@@ -892,32 +918,32 @@ export default function OrderForm({ onSuccess }) {
 
           {/* Pricing Breakdown */}
           <div className="space-y-2 pt-4">
-             <div className="flex justify-between text-white/50 text-xs">
+             <div className="flex justify-between text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                 <span>Subtotal (Base)</span>
                 <span>৳ {subtotal - order.items.reduce((a,c) => a+c.extraCharge, 0)}</span>
              </div>
              {order.items.some(i => i.extraCharge > 0) && (
-               <div className="flex justify-between text-amber-400 text-xs italic">
+               <div className="flex justify-between text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                   <span>Size Surcharge / Adjustments</span>
                   <span>+ ৳ {order.items.reduce((a,c) => a+c.extraCharge, 0)}</span>
                </div>
              )}
              {discountAmount > 0 && (
-               <div className="flex justify-between text-red-400 text-xs">
+               <div className="flex justify-between text-red-500 text-[10px] font-black uppercase tracking-widest">
                   <span>Discount ({order.discount.percentage}%)</span>
                   <span>- ৳ {discountAmount}</span>
                </div>
              )}
-             <div className="flex justify-between text-white/50 text-xs">
+             <div className="flex justify-between text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                 <span>Delivery Fee</span>
                 <span>+ ৳ {order.delivery.charge}</span>
              </div>
-             <div className="flex justify-between text-white font-bold text-lg pt-2 border-t border-white/10 mt-2">
+             <div className="flex justify-between text-zinc-950 font-black text-2xl pt-6 border-t border-black/5 mt-4 uppercase tracking-tighter">
                 <span>Grand Total</span>
-                <span className="text-gold-400">৳ {total}</span>
+                <span className="text-zinc-950">৳ {total}</span>
              </div>
-             <div className="flex justify-between text-red-400 text-xs font-bold bg-red-400/10 p-2 rounded-lg">
-                <span>Remaining Due</span>
+             <div className="flex justify-between text-red-500 text-[10px] font-black uppercase tracking-widest bg-red-500/5 p-4 rounded-2xl border border-red-500/10">
+                <span>Remaining Ledger Due</span>
                 <span>৳ {due}</span>
              </div>
           </div>
@@ -925,10 +951,10 @@ export default function OrderForm({ onSuccess }) {
           <button 
             type="submit"
             disabled={submitting}
-            className="w-full bg-gold-500 hover:bg-gold-600 text-emerald-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-gold-500/20 active:scale-95"
+            className="w-full bg-zinc-950 hover:bg-zinc-800 text-white font-black py-5 rounded-[2.5rem] flex items-center justify-center gap-3 transition-all shadow-2xl active:scale-[0.98] text-[11px] uppercase tracking-[0.3em]"
           >
-            {submitting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
-            Submit Luxury Order
+            {submitting ? <RefreshCw className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
+            Authorize Order Protocol
           </button>
         </section>
 

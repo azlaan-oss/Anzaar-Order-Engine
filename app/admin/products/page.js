@@ -23,7 +23,9 @@ import {
   AlertTriangle,
   Search,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  Edit,
+  Bell
 } from 'lucide-react';
 import PerformanceAnalytics from '../../../components/PerformanceAnalytics';
 import Link from 'next/link';
@@ -97,7 +99,7 @@ export default function ProductsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 md:p-12 bg-emerald-950/90 backdrop-blur-md"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 md:p-12 bg-zinc-950/30 backdrop-blur-sm"
             onClick={() => {
               setShowForm(false);
               setSelectedProduct(null);
@@ -128,128 +130,112 @@ export default function ProductsPage() {
         document.body
       )}
 
-      <div className="max-w-[1600px] mx-auto space-y-8 pb-10 px-6">
+      <div className="max-w-[1600px] mx-auto space-y-12 pb-10 px-6">
       
-      {/* Premium Hub Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-             <Link href="/" className="p-2 bg-white border border-gray-100 rounded-xl hover:bg-emerald-50 text-emerald-950 transition-all shadow-sm">
-                <ArrowLeft className="w-5 h-5" />
-             </Link>
-             <div className="px-3 py-1 bg-emerald-50 text-emerald-900 rounded-full text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
-                Inventory Intelligence
-             </div>
+      {/* Super Advance Dynamic Hero Header */}
+      <div className="relative mt-8 group">
+        <div className="absolute -inset-4 bg-zinc-950/5 rounded-[4rem] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity duration-1000" />
+        <div className="relative bg-white rounded-[3.5rem] overflow-hidden border border-black/5 shadow-xl">
+          
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-zinc-100 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-zinc-50 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+
+          <div className="relative p-10 md:p-14 flex flex-col xl:flex-row items-center justify-between gap-12">
+            
+            <div className="flex flex-col items-center xl:items-start text-center xl:text-left space-y-4">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-100 border border-black/5 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-zinc-950 animate-ping" />
+                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Inventory Dashboard</span>
+              </div>
+              
+              <div className="space-y-1">
+                <h1 className="text-5xl md:text-6xl font-black text-zinc-950 tracking-tight">
+                  Product <span className="text-zinc-300">Inventory</span>
+                </h1>
+                <p className="text-zinc-400 font-black text-xs uppercase tracking-[0.4em] pl-1">Manage Your Collection</p>
+              </div>
+
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex -space-x-3">
+                   {products.slice(0, 5).map((p, i) => (
+                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-zinc-100 shadow-xl">
+                         <img src={p.variants[0]?.imageUrl} className="w-full h-full object-cover grayscale" />
+                      </div>
+                   ))}
+                </div>
+                <div className="h-10 w-[1px] bg-black/5 mx-2" />
+                <div className="flex flex-col text-left">
+                   <span className="text-zinc-950 text-sm font-black tracking-tight">{stats.count}+ Products</span>
+                   <span className="text-zinc-400 text-[9px] font-bold uppercase tracking-widest">Active in shop</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full xl:max-w-2xl">
+              {[
+                { label: 'Total Products', value: stats.count, icon: PackageCheck, color: 'text-zinc-400', bg: 'bg-zinc-50' },
+                { label: 'Color Variants', value: stats.variants, icon: Palette, color: 'text-zinc-400', bg: 'bg-zinc-50' },
+                { label: 'Categories', value: stats.categories, icon: Layers, color: 'text-zinc-400', bg: 'bg-zinc-50' }
+              ].map((stat, i) => (
+                <motion.div 
+                  key={i}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="bg-white/50 backdrop-blur-sm border border-black/5 p-6 rounded-[2.5rem] flex flex-col items-center justify-center text-center space-y-2 shadow-sm"
+                >
+                  <div className={`p-3 rounded-2xl ${stat.bg}`}>
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">{stat.label}</p>
+                    <h3 className="text-2xl font-black text-zinc-950 tracking-tighter">{stat.value}</h3>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-4 w-full md:w-80">
+                <div className="relative group/search">
+                   <div className="absolute inset-0 bg-zinc-950/5 blur-xl rounded-2xl opacity-0 group-hover/search:opacity-100 transition-opacity" />
+                   <div className="relative bg-zinc-100 border border-black/5 p-1.5 rounded-2xl flex items-center px-5 gap-4 focus-within:bg-white focus-within:shadow-xl transition-all">
+                     <Search className="text-zinc-400 w-5 h-5" />
+                     <input 
+                       type="text" 
+                       placeholder="Search items..." 
+                       value={searchQuery}
+                       onChange={e => setSearchQuery(e.target.value)}
+                       className="bg-transparent border-none text-zinc-950 text-[11px] font-black w-full focus:outline-none placeholder:text-zinc-300 h-10 tracking-widest"
+                     />
+                   </div>
+                </div>
+ 
+                <button 
+                   onClick={() => setShowForm(true)}
+                   className="relative group/btn"
+                >
+                   <div className="relative bg-zinc-950 hover:bg-zinc-800 text-white px-8 py-5 rounded-[2rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95">
+                     <div className="bg-white p-1.5 rounded-lg text-zinc-950">
+                        <Plus className="w-4 h-4" />
+                     </div>
+                     Add New Product
+                   </div>
+                </button>
+            </div>
+
           </div>
         </div>
-
-         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2">
-               <h1 className="text-3xl font-serif font-black text-emerald-950 tracking-tight">The Product Vault</h1>
-               <div className="flex items-center gap-3">
-                  <span className="w-8 h-1 bg-gold-500 rounded-full" />
-                  <p className="text-gray-400 font-bold text-xs uppercase tracking-[0.3em]">Master Inventory Control</p>
-               </div>
-            </div>
-            
-            <div className="flex items-center gap-4 w-full md:w-auto">
-               <div className="flex-1 md:w-80 bg-emerald-950 p-1 rounded-2xl flex items-center px-4 gap-3 shadow-xl">
-                  <Search className="text-emerald-500 w-4 h-4" />
-                  <input 
-                    type="text" 
-                    placeholder="Search Vault (Name, Category)..." 
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="bg-transparent border-none text-white text-[10px] font-bold w-full focus:outline-none placeholder:text-white/20 h-10"
-                  />
-               </div>
-               <button 
-                  onClick={() => setShowForm(true)}
-                  className="bg-emerald-900 text-gold-400 px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-emerald-900/20 hover:bg-emerald-950 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
-               >
-                  <Plus className="w-4 h-4" />
-                  Expand Collection
-               </button>
-            </div>
-         </div>
       </div>
-
-       {/* Intelligence Dashboard */}
-      {!showForm && (
-        <div className="space-y-8">
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                 <PerformanceAnalytics 
-                    title="Revenue Velocity (Est.)" 
-                    data={stats.salesData} 
-                    height={280}
-                 />
-              </div>
-              <div className="space-y-6">
-                 <div className="bg-emerald-950 p-6 rounded-[2rem] text-white space-y-4 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                       <Zap className="w-24 h-24" />
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">Inventory Health</p>
-                    <h3 className="text-2xl font-serif font-black tracking-tight">Optimal Flow</h3>
-                    <div className="pt-4 flex items-center gap-4">
-                       <span className="text-4xl font-black">{Math.round((stats.count / 50) * 100)}%</span>
-                       <p className="text-[10px] font-bold text-emerald-200 uppercase leading-relaxed">
-                          Capacity utilized based on<br/>active SKU density.
-                       </p>
-                    </div>
-                 </div>
-
-                  {/* Health card removed per request */}
-              </div>
-           </div>
-
-           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
-                 <div className="bg-emerald-50 text-emerald-950 p-4 rounded-2xl">
-                    <PackageCheck className="w-6 h-6" />
-                 </div>
-                 <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Master Units</p>
-                    <h3 className="text-xl font-black text-emerald-950">{stats.count} Products</h3>
-                 </div>
-              </div>
-              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
-                 <div className="bg-amber-50 text-amber-600 p-4 rounded-2xl">
-                    <Palette className="w-6 h-6" />
-                 </div>
-                 <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Variations</p>
-                    <h3 className="text-xl font-black text-emerald-950">{stats.variants} SKUs</h3>
-                 </div>
-              </div>
-              <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
-                 <div className="bg-purple-50 text-purple-600 p-4 rounded-2xl">
-                    <Layers className="w-6 h-6" />
-                 </div>
-                 <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Series</p>
-                    <h3 className="text-xl font-black text-emerald-950">{stats.categories} Collections</h3>
-                 </div>
-              </div>
-           </div>
-        </div>
-      )}
 
       {/* Product List Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {loading && products.length === 0 ? (
-          Array(6).fill(0).map((_, i) => (
-             <div key={i} className="h-96 bg-gray-50 rounded-[3rem] animate-pulse" />
-          ))
-        ) : filteredProducts.length === 0 ? (
-          <div className="col-span-full py-32 bg-white border-4 border-dashed border-gray-50 rounded-[4rem] text-center space-y-6">
-             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
-               <ShoppingBag className="w-10 h-10 text-gray-200" />
+        {loading && products.length === 0 ? null : filteredProducts.length === 0 ? (
+          <div className="col-span-full py-32 bg-white border border-black/5 rounded-[4rem] text-center space-y-6">
+             <div className="w-24 h-24 bg-zinc-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
+               <ShoppingBag className="w-10 h-10 text-zinc-200" />
              </div>
              <div className="space-y-2">
-                <h3 className="text-2xl font-serif font-black text-gray-950">No Matches in Vault</h3>
-                <p className="text-gray-400 text-sm max-w-xs mx-auto">Try adjusting your search query or add a new mastery unit to the collection.</p>
+                <h3 className="text-2xl font-black text-zinc-950 uppercase tracking-widest">No Matches in Vault</h3>
+                <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest max-w-xs mx-auto">Try adjusting your search query or add a new mastery unit to the collection.</p>
              </div>
           </div>
         ) : filteredProducts.map((product, idx) => (
@@ -258,83 +244,73 @@ export default function ProductsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            onClick={() => setSelectedProduct(product)}
-            className="bg-white rounded-[3rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl transition-all group flex flex-col cursor-pointer active:scale-95"
+            className="bg-white rounded-[2.5rem] overflow-hidden border border-black/5 shadow-sm hover:shadow-2xl transition-all group flex flex-col"
           >
-            <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
+            <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 cursor-pointer" onClick={() => setSelectedProduct(product)}>
                <img 
                 src={product.variants[0]?.imageUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80'} 
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                className={`w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 ${product.isStockOut ? 'grayscale contrast-125 opacity-40' : ''}`} 
                 alt={product.name}
                />
                
-                {/* Premium Overlays */}
-                <div className="absolute top-6 left-6 flex flex-col gap-2">
-                   <div className="flex items-center gap-2">
-                      <span className="bg-emerald-950/80 backdrop-blur-md text-[10px] font-bold text-gold-400 px-3 py-1.5 rounded-full uppercase tracking-widest shadow-xl">
-                        {product.category || 'Luxury'}
-                      </span>
-                      {/* Low stock badge removed */}
-                   </div>
-                   <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg">
-                      <Sparkles className="w-3 h-3 text-gold-500" />
-                      <span className="text-[10px] font-black text-emerald-950 uppercase tracking-widest">৳ {product.basePrice}</span>
-                   </div>
-                </div>
+               {product.isStockOut && (
+                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-red-600 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.3em] shadow-2xl shadow-red-600/50 -rotate-12 border-4 border-white">
+                       Stock Out
+                    </div>
+                 </div>
+               )}
 
-                {/* QR Code Quick Action */}
-                <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${product.id}`, '_blank');
-                    }}
-                    className="p-3 bg-white rounded-2xl shadow-xl hover:scale-110 transition-transform"
-                   >
-                     <QrCode className="w-5 h-5 text-emerald-950" />
-                   </button>
-                </div>
-
-               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
             <div className="p-5 space-y-4 flex-1 flex flex-col">
               <div className="space-y-1">
-                <h3 className="font-serif font-black text-emerald-950 text-xl uppercase tracking-tighter leading-tight group-hover:text-emerald-800 transition-colors">
-                   {product.name}
-                </h3>
-                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Ref: {String(product.id).substring(0, 8)}</p>
+                <div className="flex items-center justify-between">
+                   <h3 className="font-black text-zinc-950 text-xl uppercase tracking-tighter leading-tight group-hover:text-zinc-600 transition-colors">
+                      {product.name}
+                   </h3>
+                   <span className="text-sm font-black text-zinc-950">৳ {product.basePrice}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <p className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Ref: {String(product.id).substring(0, 8)}</p>
+                   <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">• {product.category || 'Luxury'}</span>
+                </div>
               </div>
               
               <div className="flex-1 flex flex-col justify-end space-y-3">
                  <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                       {product.variants.slice(0, 4).map((v, i) => (
-                          <div 
-                            key={i}
-                            className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-lg"
-                            title={v.color}
-                          >
-                             <img src={v.imageUrl} className="w-full h-full object-cover" />
-                          </div>
-                       ))}
-                       {product.variants.length > 4 && (
-                          <div className="w-8 h-8 rounded-full bg-emerald-50 border-2 border-white flex items-center justify-center text-[8px] font-black text-emerald-900 shadow-lg">
-                             +{product.variants.length - 4}
-                          </div>
-                       )}
-                    </div>
-                    <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">
-                       {product.variants.length} Tones
-                    </div>
-                 </div>
-
-                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-emerald-900/40 group-hover:text-emerald-900 transition-colors">
-                       <span className="text-[10px] font-black uppercase tracking-widest">Master Configure</span>
-                       <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                 </div>
+                        {product.variants.slice(0, 4).map((v, i) => (
+                           <div 
+                             key={i}
+                             className={`w-8 h-8 rounded-full border border-black/5 overflow-hidden shadow-sm relative ${v.isStockOut ? 'ring-2 ring-red-500' : ''}`}
+                             title={v.color + (v.isStockOut ? ' (Stock Out)' : '')}
+                           >
+                              <img src={v.imageUrl} className={`w-full h-full object-cover ${v.isStockOut ? 'grayscale opacity-50' : ''}`} />
+                              {v.isStockOut && <div className="absolute inset-0 bg-red-500/20" />}
+                           </div>
+                        ))}
+                        {product.variants.length > 4 && (
+                           <div className="w-8 h-8 rounded-full bg-zinc-100 border border-black/5 flex items-center justify-center text-[8px] font-black text-zinc-950 shadow-sm">
+                              +{product.variants.length - 4}
+                           </div>
+                        )}
+                     </div>
+                     <div className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">
+                        {product.variants.length} Tones
+                     </div>
+                  </div>
+ 
+                  <div className="pt-4 border-t border-black/5 flex items-center justify-between">
+                     <button onClick={() => setSelectedProduct(product)} className="p-3 bg-zinc-100 text-zinc-950 rounded-xl hover:bg-zinc-950 hover:text-white transition-all shadow-sm">
+                       <Edit className="w-4 h-4" />
+                     </button>
+                     <button className="relative w-11 h-11 bg-zinc-100 hover:bg-zinc-200 rounded-2xl flex items-center justify-center border border-black/5 transition-all group shadow-sm">
+                       <Bell className="w-5 h-5 text-zinc-400 group-hover:text-zinc-950 transition-colors" />
+                       <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                     </button>
+                  </div>
               </div>
             </div>
           </motion.div>
