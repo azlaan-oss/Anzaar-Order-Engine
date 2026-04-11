@@ -33,6 +33,9 @@ export default function Dashboard() {
   const [timeFilter, setTimeFilter] = useState('today'); 
   const [liveLogs, setLiveLogs] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [isCustomDate, setIsCustomDate] = useState(false);
   
   useEffect(() => {
     // OPTIMIZED: Added limit(100) to keep dashboard snappy
@@ -67,6 +70,15 @@ export default function Dashboard() {
 
     return allOrders.filter(order => {
       const orderTime = new Date(order.timestamp).getTime();
+      
+      if (timeFilter === 'custom' && startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = endDate ? new Date(endDate) : new Date(startDate);
+        end.setHours(23, 59, 59, 999);
+        return orderTime >= start.getTime() && orderTime <= end.getTime();
+      }
+
       if (timeFilter === 'today') return orderTime >= today;
       if (timeFilter === 'yesterday') return orderTime >= yesterday && orderTime < today;
       if (timeFilter === '7days') return orderTime >= last7Days;
@@ -120,18 +132,63 @@ export default function Dashboard() {
           <h1 className="text-4xl md:text-5xl font-bold text-zinc-950 tracking-tight">Business Console</h1>
         </div>
         
-        <div className="flex items-center bg-white p-1.5 rounded-full border border-black/5 shadow-xl min-w-fit">
-           {['today', 'yesterday', '7days', 'month', 'all'].map((f) => (
-             <button 
-              key={f}
-              onClick={() => setTimeFilter(f)}
-              className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                timeFilter === f ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20' : 'text-zinc-400 hover:text-zinc-950'
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          <div className="flex items-center bg-white p-1.5 rounded-full border border-black/5 shadow-xl min-w-fit overflow-x-auto no-scrollbar">
+            {['today', 'yesterday', '7days', 'month'].map((f) => (
+              <button 
+                key={f}
+                onClick={() => {
+                  setTimeFilter(f);
+                  setIsCustomDate(false);
+                }}
+                className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                  timeFilter === f && !isCustomDate ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20' : 'text-zinc-400 hover:text-zinc-950'
+                }`}
+              >
+                {f === '7days' ? 'Week' : f}
+              </button>
+            ))}
+            <button 
+              onClick={() => setIsCustomDate(!isCustomDate)}
+              className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+                isCustomDate ? 'bg-zinc-950 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-950'
               }`}
-             >
-               {f === '7days' ? 'Week' : f}
-             </button>
-           ))}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Calendar
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {isCustomDate && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95, x: 20 }}
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-black/5 shadow-xl"
+              >
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => {
+                    setStartDate(e.target.value);
+                    setTimeFilter('custom');
+                  }}
+                  className="bg-transparent text-[10px] font-black uppercase outline-none text-zinc-950 [color-scheme:light] w-24"
+                />
+                <span className="text-zinc-200 font-black">/</span>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value);
+                    setTimeFilter('custom');
+                  }}
+                  className="bg-transparent text-[10px] font-black uppercase outline-none text-zinc-950 [color-scheme:light] w-24"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
