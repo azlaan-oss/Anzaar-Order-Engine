@@ -129,7 +129,7 @@ export default function Dashboard() {
                 timeFilter === f ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20' : 'text-zinc-400 hover:text-zinc-950'
               }`}
              >
-               {f === '7days' ? '1 Week' : f}
+               {f === '7days' ? 'Week' : f}
              </button>
            ))}
         </div>

@@ -256,7 +256,7 @@ export default function OrdersPage() {
                          : 'text-zinc-400 hover:text-zinc-600'
                       }`}
                    >
-                      {d === 'all' ? 'All Orders' : d === '30days' ? 'Month' : d}
+                      {d === 'all' ? 'All Orders' : d === '30days' ? 'Month' : d === '7days' ? 'Week' : d}
                    </button>
                 ))}
              </div>
