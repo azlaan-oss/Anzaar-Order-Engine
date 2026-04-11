@@ -388,7 +388,7 @@ export default function OrderForm({ onSuccess }) {
                 <div className="bg-zinc-950/5 p-2 rounded-lg text-zinc-950">
                   <User className="w-5 h-5" />
                 </div>
-                <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Customer Pulse</h3>
+                <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Customer Details</h3>
               </div>
               
               <AnimatePresence>
@@ -419,7 +419,7 @@ export default function OrderForm({ onSuccess }) {
               className="bg-white/40 backdrop-blur-3xl p-4 rounded-3xl flex items-center justify-between text-zinc-950 border border-black/5"
             >
                <div className="space-y-1">
-                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Lifetime Pulse</p>
+                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest">Total Spent</p>
                   <p className="text-sm font-black tracking-tight">৳ {customerIntel.totalSpent.toLocaleString()}</p>
                </div>
                <div className="flex items-center gap-4 text-center border-l border-white/10 pl-4">
@@ -445,21 +445,7 @@ export default function OrderForm({ onSuccess }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
-               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Identified Name</label>
-               <div className="relative">
-                 <input 
-                   type="text" required
-                   autoFocus
-                   value={order.customer.name}
-                   onChange={e => setOrder({...order, customer: {...order.customer, name: e.target.value}})}
-                   className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
-                   placeholder="ENTER FULL IDENTITY"
-                 />
-                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
-               </div>
-             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Protocol Phone</label>
+              <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Phone Number</label>
               <div className="relative group">
                 <input 
                   type="tel" required
@@ -471,10 +457,23 @@ export default function OrderForm({ onSuccess }) {
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
               </div>
             </div>
+            <div className="space-y-1">
+               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Customer Name</label>
+               <div className="relative">
+                 <input 
+                   type="text" required
+                   value={order.customer.name}
+                   onChange={e => setOrder({...order, customer: {...order.customer, name: e.target.value}})}
+                   className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
+                   placeholder="FULL NAME"
+                 />
+                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300" />
+               </div>
+             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Sector Vector (Address)</label>
+            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Full Address</label>
             <div className="relative">
               <textarea 
                 required
@@ -482,20 +481,20 @@ export default function OrderForm({ onSuccess }) {
                 onChange={e => setOrder({...order, customer: {...order.customer, address: e.target.value}})}
                 rows="2"
                 className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none pl-12 font-black placeholder:text-zinc-300" 
-                placeholder="VILLAGE/ROAD, HOUSE, AREA, CITY"
+                placeholder="Village/Road, Area, City"
               />
               <MapPin className="absolute left-4 top-5 w-4 h-4 text-zinc-300" />
             </div>
           </div>
 
           <div className="space-y-1 col-span-full">
-               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Special Order Directive</label>
+               <label className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em] pl-1">Order Notes</label>
                <textarea 
                  value={order.customer.notes}
                  onChange={e => setOrder({...order, customer: {...order.customer, notes: e.target.value}})}
                  rows="2"
                  className="w-full bg-white text-zinc-950 border border-black/5 p-4 rounded-2xl focus:ring-2 focus:ring-zinc-950/5 focus:outline-none font-black placeholder:text-zinc-300" 
-                 placeholder="ANY SPECIAL INSTRUCTIONS..."
+                 placeholder="ANY SPECIAL NOTES..."
                />
              </div>
 
@@ -549,7 +548,7 @@ export default function OrderForm({ onSuccess }) {
               <div className="bg-zinc-950/5 p-2 rounded-lg text-zinc-950">
                 <ShoppingBag className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Vortex Selection</h3>
+              <h3 className="font-black text-lg text-zinc-950 uppercase tracking-tight">Choose Products</h3>
            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative" ref={searchRef}>
@@ -559,7 +558,7 @@ export default function OrderForm({ onSuccess }) {
                </div>
                <input 
                  type="text"
-                 placeholder="SCAN MASTER INVENTORY..."
+                 placeholder="SEARCH PRODUCTS..."
                  value={productSearch || (selectedProduct?.name || '')}
                  onChange={(e) => {
                    setProductSearch(e.target.value);
@@ -582,7 +581,7 @@ export default function OrderForm({ onSuccess }) {
                       !p.isStockOut && 
                       p.name.toLowerCase().includes(productSearch.toLowerCase())
                     ).length === 0 ? (
-                      <div className="p-8 text-center text-[10px] font-black text-zinc-300 uppercase tracking-widest">No matching assets identified</div>
+                      <div className="p-8 text-center text-[10px] font-black text-zinc-300 uppercase tracking-widest">No products found</div>
                     ) : (
                       products.filter(p => 
                         !p.isStockOut &&
@@ -696,7 +695,7 @@ export default function OrderForm({ onSuccess }) {
                    onClick={addItemToStage}
                    className="bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
                  >
-                   Deploy Stage
+                   Add to List
                  </button>
               </motion.div>
             )}
@@ -711,9 +710,9 @@ export default function OrderForm({ onSuccess }) {
                  className="bg-black/5 rounded-3xl p-5 border border-black/5 space-y-4"
                >
                  <div className="flex justify-between items-center text-zinc-950 font-black text-[10px] uppercase tracking-[0.2em]">
-                   <span>Pipeline ({stagedItems.length})</span>
+                   <span>Items to Add ({stagedItems.length})</span>
                    <button type="button" onClick={confirmStagedToOrder} className="bg-zinc-950 text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors font-black text-[9px]">
-                     PROCESS QUEUE
+                     CONFIRM ITEMS
                    </button>
                  </div>
                  <div className="space-y-2">
@@ -749,7 +748,7 @@ export default function OrderForm({ onSuccess }) {
            
            <h3 className="font-black text-xl flex items-center gap-2 uppercase tracking-tighter text-zinc-950">
              <ShoppingBag className="w-6 h-6 text-zinc-400" />
-             Order Architecture
+             Order Summary
            </h3>
 
           <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
@@ -785,7 +784,7 @@ export default function OrderForm({ onSuccess }) {
           {/* Logic Grid */}
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Delivery Protocol</label>
+                <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Delivery Location</label>
                 <select 
                  value={order.delivery.type}
                  onChange={e => {
@@ -795,13 +794,13 @@ export default function OrderForm({ onSuccess }) {
                  }}
                  className="w-full bg-white/5 border border-white/10 p-2 rounded-xl text-xs font-black uppercase focus:outline-none"
                 >
-                  <option value="inside">Dhaka Matrix (৳{settings?.deliveryRates?.inside || 80})</option>
-                  <option value="outside">External Matrix (৳{settings?.deliveryRates?.outside || 150})</option>
+                   <option value="inside">Inside Dhaka (৳{settings?.deliveryRates?.inside || 80})</option>
+                  <option value="outside">Outside Dhaka (৳{settings?.deliveryRates?.outside || 150})</option>
                 </select>
               </div>
 
              <div className="space-y-2">
-               <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Active Campaign</label>
+               <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] pl-1">Choose Discount</label>
                <select 
                 value={order.discount.percentage}
                 onChange={e => {
@@ -827,11 +826,11 @@ export default function OrderForm({ onSuccess }) {
              <motion.div initial={{opacity:0, y:5}} animate={{opacity:1, y:0}} className="mt-4 p-4 bg-black/5 rounded-2xl border border-black/5 space-y-3">
                 <div className="flex items-center gap-2 text-zinc-950">
                    <AlertTriangle className="w-3 h-3 text-red-500" />
-                   <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Authentication Required</div>
+                   <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Permission Required</div>
                 </div>
                 <input 
                   type="number"
-                  placeholder="Manual Discount %"
+                  placeholder="Discount %"
                   value={order.discount.percentage}
                   onChange={e => setOrder({...order, discount: { ...order.discount, percentage: parseInt(e.target.value) || 0 }})}
                   className="w-full bg-white border border-black/5 p-2 rounded-lg text-xs text-zinc-950"

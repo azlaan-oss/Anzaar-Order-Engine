@@ -51,7 +51,7 @@ export default function SettingsPage() {
     const fetchSettings = async () => {
       timeoutId = setTimeout(() => {
         setLoading(false);
-        toast.error("Firebase connection taking too long. Using cached protocols.");
+        toast.error("Firebase connection taking too long. Using saved settings.");
       }, 5000);
 
       try {
@@ -73,12 +73,12 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    const toastId = toast.loading("Updating System Protocols...");
+    const toastId = toast.loading("Updating Settings...");
     try {
       await setDoc(doc(db, "settings", "global"), settings);
-      toast.success("Internal protocols updated successfully!", { id: toastId });
+      toast.success("Settings updated successfully!", { id: toastId });
     } catch (err) {
-      toast.error("Failed to update engine protocols", { id: toastId });
+      toast.error("Failed to update settings", { id: toastId });
     } finally {
       setSaving(false);
     }
@@ -107,7 +107,7 @@ export default function SettingsPage() {
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-zinc-950 tracking-tighter uppercase leading-none">Settings <span className="text-zinc-300">Hub</span></h1>
           <p className="text-zinc-400 font-medium text-sm md:text-base max-w-xl uppercase tracking-widest text-[10px]">
-             Configure the strategic engine. Managed sync ID, adjust logistics, and calibrate global campaigns.
+             Configure your site settings. Manage sync ID, adjust logistics, and set campaigns.
           </p>
         </div>
 
