@@ -35,7 +35,7 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         background: '#ffffff',
         color: '#09090b',
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
-        padding: '24px 60px 40px 60px',
+        padding: '50px 60px',
         boxSizing: 'border-box',
       }}
     >
@@ -181,17 +181,18 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
         </p>
       </div>
 
-      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (PREMIUM LIGHT CONTEXT THEME) ── */}
+      {/* ── CREATIVE & ENGAGING IMPORTANT NOTES (PREMIUM LIGHT THEME) ── */}
       <div style={{ marginTop: '40px' }}>
         <div style={{
-          background: '#f4f4f5', // Standard light grey panel
-          borderRadius: '16px', padding: '32px', color: '#18181b',
-          border: '1px solid #e4e4e7'
+          background: '#fafafa', // Standard clean premium light background
+          borderRadius: '16px', padding: '28px 32px', color: '#09090b',
+          border: '1px solid #e4e4e7',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
         }}>
           <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '14px' }}>
             <span style={{ fontSize: '32px' }}>✨</span>
             <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 4px', color: '#09090b' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 900, margin: '0 0 6px', color: '#09090b' }}>
                 আপনার শপিং অভিজ্ঞতা সুন্দর করতে কিছু জরুরি নিয়ম
               </h2>
               <p style={{ fontSize: '13px', color: '#52525b', margin: 0, fontWeight: 500 }}>
@@ -202,18 +203,18 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* 1. Unpacking Video Hero Card - Premium Soft Emerald */}
+            {/* 1. Unpacking Video Hero Card - Premium Pastel Green */}
             <div style={{
-              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-              border: '1px solid #bbf7d0',
+              background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+              border: '1px solid #86efac',
               borderRadius: '12px', padding: '20px', display: 'flex', gap: '18px', alignItems: 'center',
             }}>
               <span style={{ fontSize: '38px', lineHeight: 1 }}>📦🎥</span>
               <div>
-                <h3 style={{ fontSize: '15.5px', fontWeight: 800, margin: '0 0 6px', color: '#166534' }}>
+                <h3 style={{ fontSize: '15.5px', fontWeight: 800, margin: '0 0 6px', color: '#14532d' }}>
                   যেটি সবচেয়ে বেশি জরুরি: আনপ্যাকিং ভিডিও
                 </h3>
-                <p style={{ fontSize: '13.5px', color: '#14532d', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
+                <p style={{ fontSize: '13.5px', color: '#166534', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
                   পার্সেলটি খোলার আগে অবশ্যই মোবাইলে ভিডিও চালু করুন। এটি আপনার সুরক্ষা! আনপ্যাকিং ভিডিও ছাড়া আমরা কোনো ত্রুটি বা ক্লেইম প্রমাণ করতে পারবো না।
                 </p>
               </div>
@@ -222,59 +223,47 @@ const InvoiceTemplate = React.forwardRef(({ order }, ref) => {
             {/* 2 Grid Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               
-              {/* Color Variance Box - Light Sand */}
+              {/* Color Variance Box - Clean White */}
               <div style={{ 
                 background: '#ffffff', 
                 borderRadius: '12px', padding: '18px', 
-                border: '1px solid #e4e4e7', display: 'flex', flexDirection: 'column' 
+                border: '1px solid #e4e4e7', display: 'flex', flexDirection: 'column',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
               }}>
                 <span style={{ fontSize: '24px', display: 'block', marginBottom: '10px' }}>🎨</span>
-                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#18181b' }}>রঙের তারতম্য</h3>
-                <p style={{ fontSize: '12.5px', color: '#52525b', margin: '0 0 16px', lineHeight: 1.6, fontWeight: 500, flexGrow: 1 }}>
-                  ক্যামেরা ও লাইটিং এর কারণে বাস্তবে রঙের উজ্জ্বলতা একটু ভিন্ন দেখাতে পারে, যা স্বাভাবিক নিয়ম।
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#09090b' }}>রঙের তারতম্য</h3>
+                <p style={{ fontSize: '12.5px', color: '#52525b', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
+                  ক্যামেরা ও লাইটিং এর ব্রাইটনেসের কারণে বাস্তবে রঙের উজ্জ্বলতা একটু ভিন্ন দেখাতে পারে, যা একদম স্বাভাবিক নিয়ম।
                 </p>
-                {/* Advanced visual representation of color variance */}
-                <div style={{
-                  height: '24px',
-                  borderRadius: '6px',
-                  background: 'linear-gradient(90deg, #3f2b1c 0%, #b8865c 50%, #e0c8b6 100%)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '0 8px',
-                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)'
-                }}>
-                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em' }}>Low Light</span>
-                   <span style={{ fontSize: '9px', fontWeight: 800, color: '#ffffff', letterSpacing: '0.05em' }}>Bright Light</span>
-                </div>
               </div>
 
-              {/* Exchange Policy - Light Gray */}
+              {/* Exchange Policy - Clean White */}
               <div style={{ 
                 background: '#ffffff', 
                 borderRadius: '12px', padding: '18px', 
-                border: '1px solid #e4e4e7' 
+                border: '1px solid #e4e4e7',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
               }}>
                 <span style={{ fontSize: '24px', display: 'block', marginBottom: '10px' }}>🔁</span>
-                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#18181b' }}>এক্সচেঞ্জ সুবিধা</h3>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 6px', color: '#09090b' }}>এক্সচেঞ্জ সুবিধা</h3>
                 <p style={{ fontSize: '12.5px', color: '#52525b', margin: 0, lineHeight: 1.6, fontWeight: 500 }}>
                   ফিটিংস বা অন্য কোনো ইস্যুতে এক্সচেঞ্জ করতে চাইলে, ডেলিভারি ম্যান থাকাকালীন চার্জ দিয়ে ফেরৎ দিন অথবা ৩ দিনের মধ্যে আমাদের জানান।
                 </p>
               </div>
             </div>
 
-            {/* 3. Negative Case Warning - Soft Ruby Red */}
+            {/* 3. Negative Case Warning - Premium Pastel Red */}
             <div style={{
-              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', 
+              background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)', 
               borderRadius: '12px', padding: '18px 20px', display: 'flex', gap: '18px', alignItems: 'center',
-              border: '1px solid #fecaca',
+              border: '1px solid #fca5a5',
             }}>
               <span style={{ fontSize: '28px', lineHeight: 1 }}>🚫</span>
               <div>
-                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 4px', color: '#991b1b' }}>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, margin: '0 0 4px', color: '#7f1d1d' }}>
                   যেসব ক্ষেত্রে এক্সচেঞ্জ হবে না
                 </h3>
-                <p style={{ fontSize: '12.5px', color: '#7f1d1d', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
+                <p style={{ fontSize: '12.5px', color: '#991b1b', margin: 0, fontWeight: 500, lineHeight: 1.6 }}>
                   কাস্টমাইজড সাইজ, ডিসকাউন্ট পণ্য বা ব্যবহার করা পণ্যের ক্ষেত্রে কোনো প্রকার রিটার্ন, রিফান্ড বা এক্সচেঞ্জ প্রযোজ্য হবে না।
                 </p>
               </div>
